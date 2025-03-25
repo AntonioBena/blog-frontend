@@ -1,0 +1,15 @@
+{
+  "LOGIN": "Login",
+  "USERNAME": "User name",
+  "EMAIL": "Email",
+  "PASSWORD": "Password",
+  "REGISTER_LINK": "Don't have an account? Register",
+
+  "SUCCESS": {
+    "SUCCESS_LOGIN": "Login successful!"
+  },
+  "ERROR": {
+    "LOGIN_FAILURE": "Login failed. Please try again.",
+    "LOGIN_CHECK_CREDENTIALS": "Please check email and password"
+  }
+}

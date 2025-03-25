@@ -1,7 +1,10 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -9,6 +12,12 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { ToastrService } from '../../services/toastr.service';
 import { catchError, throwError } from 'rxjs';
+import { AuthenticationRequest } from '../../models/requests/AuthenticationRequest';
+import { AuthService } from '../../services/auth/AuthService';
+import { TokenService } from '../../services/auth/TokenService';
+import { StatusCodes } from '../../constants/http-status-codes';
+import { NavigatorService } from '../../services/navigator';
+import { ToastType } from '../../constants/toast-types';
 
 @Component({
   selector: 'app-login',
@@ -18,28 +27,58 @@ import { catchError, throwError } from 'rxjs';
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule,
-  ],
+    MatButtonModule
+    ],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.css'
+  styleUrl: './login.component.css',
 })
 export class LoginComponent {
-
   loginForm: FormGroup;
 
-  constructor(private fb: FormBuilder, private router: Router,
+  constructor(
+    private fb: FormBuilder,
+    private navigator: NavigatorService,
     private toastr: ToastrService,
+    private authService: AuthService,
+    private tokenService: TokenService
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required]]
+      password: ['', [Validators.required]],
     });
   }
 
-  onRegisterLink(){
+  onRegisterLink() {
+    this.navigator.navigateToRegister();
   }
 
   onLogin() {
+    if (this.loginForm.valid) {
+      var auth = new AuthenticationRequest();
+      auth.email = this.loginForm.value.email;
+      auth.password = this.loginForm.value.password;
 
+      this.authService
+        .login(auth)
+        .pipe(
+          catchError((error) => {
+            if (error.status === StatusCodes.BadRequest) {
+              this.toastr.showToastTc(ToastType.ERROR, 'Please check email and password');
+            }else if(error.status === StatusCodes.Unauthorized){
+              this.toastr.showToastTc(ToastType.ERROR, 'User not authorized!');
+            }
+            console.error('Login error:');
+            return throwError(
+              () => new Error('Login error ' + JSON.stringify(error))
+            );
+          })
+        )
+        .subscribe((data) => {
+          this.toastr.showToastTc(ToastType.SUCCESS, 'Login succcessful');
+          console.log('Login Successful:');
+          this.tokenService.token = data.token as string;
+          this.navigator.navigateToMain();
+        });
+    }
   }
 }

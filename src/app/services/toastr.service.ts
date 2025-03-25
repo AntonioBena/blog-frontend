@@ -12,7 +12,7 @@ export class ToastrService {
 
   constructor() { }
 
-  public showToast_tc(type: string, message: string) {
+  public showToastTc(type: string, message: string) {
     this.createToast(type, message, "top-center", true);
   }
 
