@@ -18,6 +18,7 @@ import { TokenService } from '../../services/auth/TokenService';
 import { StatusCodes } from '../../constants/http-status-codes';
 import { NavigatorService } from '../../services/navigator';
 import { ToastType } from '../../constants/toast-types';
+import { emailValidator } from '../../validation/email-validator';
 
 @Component({
   selector: 'app-login',
@@ -27,8 +28,8 @@ import { ToastType } from '../../constants/toast-types';
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule
-    ],
+    MatButtonModule,
+  ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
 })
@@ -43,7 +44,7 @@ export class LoginComponent {
     private tokenService: TokenService
   ) {
     this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
+      email: ['', [Validators.required, emailValidator()]],
       password: ['', [Validators.required]],
     });
   }
@@ -63,8 +64,11 @@ export class LoginComponent {
         .pipe(
           catchError((error) => {
             if (error.status === StatusCodes.BadRequest) {
-              this.toastr.showToastTc(ToastType.ERROR, 'Please check email and password');
-            }else if(error.status === StatusCodes.Unauthorized){
+              this.toastr.showToastTc(
+                ToastType.ERROR,
+                'Please check email and password'
+              );
+            } else if (error.status === StatusCodes.Unauthorized) {
               this.toastr.showToastTc(ToastType.ERROR, 'User not authorized!');
             }
             console.error('Login error:');

@@ -18,8 +18,8 @@ export class NavigatorService{
     return this.router.navigate(['/' + RoutesConstants.REGISTER_ROUTE]); //'/register'
   }
 
-  public navigateToActivateAcc(){
-    return this.router.navigate(['/' + RoutesConstants.ACTIVATE_ACC_ROUTE]);
+  public navigateToActivateAcc(email: string){
+    return this.router.navigate(['/' + RoutesConstants.ACTIVATE_ACC_ROUTE, {'data': email}]);
   }
 
   public navigateToMain(){
