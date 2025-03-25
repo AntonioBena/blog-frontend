@@ -1,11 +1,12 @@
 import { inject } from '@angular/core';
 import { CanActivateFn } from '@angular/router';
-import { ApiConstants } from '../../constants/api-constants';
 import { NavigatorService } from '../navigator';
+import { TokenService } from './TokenService';
 
 export const AuthGuard: CanActivateFn = () => {
   const navigator = inject(NavigatorService);
-  const token = localStorage.getItem(ApiConstants.TOKEN);
+  const tokenService = inject(TokenService);
+  const token = tokenService.token;
   if (token) {
     return true;
   } else {
