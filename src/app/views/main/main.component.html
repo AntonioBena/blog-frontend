@@ -1,4 +1,11 @@
-<div class="main-view">
-  <h2>Welcome to Blog</h2>
-  <app-post-list></app-post-list>
-</div>
+<div class="main-container">
+  <div class="content">
+    <h1 class="blog-title">Blog</h1>
+    <nav class="nav">
+      <mat-tab-group (selectedTabChange)="fetchPostsByCategory(categories[$event.index])">
+        <mat-tab *ngFor="let category of categories" [label]="category">
+          <app-post-list [posts]="posts"></app-post-list>
+        </mat-tab>
+      </mat-tab-group>
+    </nav>
+  </div>

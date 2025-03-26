@@ -1,3 +1,23 @@
+<mat-toolbar *ngIf="showToolbar">
+  <button mat-icon-button class="example-icon" aria-label="Example icon-button with menu icon">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <span>My App</span>
+  <span class="example-spacer"></span>
+  <div style="display: flex; align-items: center;">
+    <button *ngIf="isWriter" mat-icon-button class="example-icon"
+      matTooltip="Write new post"
+      aria-label="Example icon-button with share icon">
+      <mat-icon>edit_note</mat-icon>
+    </button>
+  </div>
+  <button mat-icon-button class="example-icon favorite-icon"
+  matTooltip="User Profile"
+  aria-label="Example icon-button with heart icon">
+    <mat-icon>person</mat-icon>
+  </button>
+</mat-toolbar>
+
 <div class="toast-container" *ngIf="showToast" [ngClass]="{
   success: toastrType == 'success',
   error: toastrType == 'error',
@@ -10,7 +30,7 @@
 }">
   <span class="closeBtn" (click)="closeToast()">x</span>
   <div class="toast-content">
-    <span  *ngIf="toastrType == 'success'">
+    <span *ngIf="toastrType == 'success'">
       <mat-icon aria-hidden="false" fontIcon="check"></mat-icon>
     </span>
     <span *ngIf="toastrType == 'error'">X </span>

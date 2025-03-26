@@ -17,4 +17,8 @@ export class TokenService{
   get token(){
     return localStorage.getItem(ApiConstants.TOKEN) as string;
   }
+
+  public checkTokenExists(){
+    return this.token != null? true : false;
+  }
 }

@@ -3,13 +3,21 @@ import { RouterOutlet } from '@angular/router';
 import { ToastrService } from './services/toastr.service';
 import { CommonModule } from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
+import {MatButtonModule} from '@angular/material/button';
+import {MatToolbarModule} from '@angular/material/toolbar';
+import { TokenService } from './services/auth/TokenService';
+import {MatTooltipModule} from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-root',
   imports: [
     RouterOutlet,
     CommonModule,
-    MatIconModule
+    MatIconModule,
+    MatToolbarModule,
+    MatButtonModule,
+    MatIconModule,
+    MatTooltipModule
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
@@ -17,12 +25,20 @@ import {MatIconModule} from '@angular/material/icon';
 export class AppComponent implements OnInit{
   title = 'blog';
 
+  showToolbar = true; //TODO auth check logic
+  isWriter = true; //TODO writer check logic
+
   showToast = false;
   toastrMsg = "";
   toastrType = "";
   toastrPosition = "";
 
-  constructor(private toastr: ToastrService) {
+  constructor(private toastr: ToastrService, private tokenService: TokenService) {
+    if(tokenService.checkTokenExists()){
+      this.showToolbar = true;
+    }else{
+      //this.showToolbar = false;
+    }
   }
 
   ngOnInit(): void {

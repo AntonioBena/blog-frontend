@@ -6,5 +6,5 @@ export class ApiConstants {
   public static readonly ACTIVATE_ACCOUNT_ENDPOINT = '/activate-account';
   public static readonly ACTIVATE_ACCOUNT_PARAM = 'activationCode';
 
-  public static readonly TOKEN = "token";
+  public static readonly TOKEN = "auth_token";
 }
