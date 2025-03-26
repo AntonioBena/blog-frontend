@@ -1,0 +1,13 @@
+<div class="post-list">
+  <div *ngFor="let post of posts" class="post" (click)="onPostClick(post)">
+    <div class="post-content">
+      <h3 class="post-title">{{ post.title }}</h3>
+      <p class="post-text">{{ post.content.slice(0, 200) }}...</p>
+      <div class="post-footer">
+        <span>❤️ {{ post.likes }}</span>
+        <span>💬 {{ post.comments }}</span>
+      </div>
+    </div>
+    <img [src]="post.imageUrl" alt="Post Image" class="post-image">
+  </div>
+</div>
