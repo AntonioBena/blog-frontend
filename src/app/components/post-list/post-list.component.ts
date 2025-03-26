@@ -2,13 +2,13 @@ import { Component, Input } from '@angular/core';
 import { Post } from '../../models/Post';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
-
-import postsData from '../../assets/posts.json';
+import {MatTooltipModule} from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-post-list',
   imports: [
-    CommonModule
+    CommonModule,
+    MatTooltipModule
   ],
   templateUrl: './post-list.component.html',
   styleUrl: './post-list.component.css'
