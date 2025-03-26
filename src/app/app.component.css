@@ -96,3 +96,15 @@
 mat-toolbar{
   background-color: #ffffff;
 }
+
+.toolbar{
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.empty-space{
+  padding-bottom: 30px;
+}

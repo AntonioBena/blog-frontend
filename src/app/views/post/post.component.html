@@ -1,0 +1,22 @@
+<div class="main-container">
+  <div class="content">
+    <p>Return to main page</p>
+    <h1>
+      <span [innerHTML]="postTitle"></span>
+    </h1>
+    <div class="author">
+      <span>By </span>
+      <span><a href="#" class="follow">Mr. Benkovic</a></span>
+    </div>
+
+    <div class="metadata">Published on Feb 21, 2025</div>
+
+    <mat-divider class="divider"></mat-divider>
+    <div class="stats">
+      <span matTooltip="{{likes}} reactions">❤️ {{ likes }}</span>
+      <span matTooltip="{{comments}} comments">💬 {{ comments }}</span>
+    </div>
+    <mat-divider class="divider"></mat-divider>
+    <div #contentContainer [innerHTML]="postContent"></div>
+  </div>
+</div>

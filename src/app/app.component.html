@@ -1,4 +1,4 @@
-<mat-toolbar *ngIf="showToolbar">
+<mat-toolbar *ngIf="showToolbar" class="toolbar">
   <span style="font-weight: 400;">Blogger</span>
   <span class="example-spacer"></span>
   <div style="display: flex; align-items: center;">
@@ -14,6 +14,7 @@
     <mat-icon>person</mat-icon>
   </button>
 </mat-toolbar>
+<div class="empty-space"></div>
 
 <div class="toast-container" *ngIf="showToast" [ngClass]="{
   success: toastrType == 'success',

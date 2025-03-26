@@ -22,5 +22,29 @@
     "imageUrl": "https://learn.g2crowd.com/hubfs/fullsizeoutput_4d.jpeg",
     "likes": 200,
     "comments": 60
+  },
+  {
+    "id": 4,
+    "title": "Exploring Angular Components",
+    "content": "Angular components are the building blocks of an application. They allow us to create reusable UI elements...",
+    "imageUrl": "https://images.pexels.com/photos/1779487/pexels-photo-1779487.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+    "likes": 120,
+    "comments": 45
+  },
+  {
+    "id": 5,
+    "title": "Understanding TypeScript",
+    "content": "TypeScript is a powerful superset of JavaScript that adds static typing. It helps developers catch errors early...",
+    "imageUrl": "https://cdn.pixabay.com/photo/2018/05/18/15/30/web-design-3411373_1280.jpg",
+    "likes": 85,
+    "comments": 20
+  },
+  {
+    "id": 6,
+    "title": "The Future of Web Development",
+    "content": "Web development is evolving rapidly with frameworks like Angular, React, and Vue. Staying updated is crucial...",
+    "imageUrl": "https://learn.g2crowd.com/hubfs/fullsizeoutput_4d.jpeg",
+    "likes": 200,
+    "comments": 60
   }
 ]
