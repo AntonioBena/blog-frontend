@@ -1,9 +1,11 @@
 import { CommonModule } from '@angular/common';
 import {
-  AfterViewInit,
   ChangeDetectorRef,
   Component,
   ElementRef,
+  Inject,
+  Input,
+  OnInit,
   ViewChild,
   ViewContainerRef,
   ViewEncapsulation,
@@ -14,6 +16,8 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { GenericConstants } from '../../constants/app-generic-constants';
 import { YouTubePlayerModule } from '@angular/youtube-player';
 import { SafeHtmlPipe } from '../../components/video/safe-html.pipe';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Content } from '../../models/content';
 
 @Component({
   selector: 'app-post',
@@ -22,66 +26,42 @@ import { SafeHtmlPipe } from '../../components/video/safe-html.pipe';
     MatTooltip,
     MatDividerModule,
     YouTubePlayerModule,
-    SafeHtmlPipe
-],
+    SafeHtmlPipe,
+  ],
   templateUrl: './post.component.html',
   styleUrl: './post.component.css',
   encapsulation: ViewEncapsulation.None,
 })
-export class PostComponent implements AfterViewInit {
+export class PostComponent implements OnInit {
+  @Input() data: any;
+  dialogData!: Content;
+  public postContent: string = '';
+
   sanitizedContent!: SafeHtml;
   @ViewChild('contentContainer', { read: ViewContainerRef })
   contentContainer!: ViewContainerRef;
   @ViewChild('contentRef', { static: true }) contentRef!: ElementRef;
 
-  likes: number = 300;
-  comments: number = 1;
-
-  postTitle: string =
-    'Spring Says Goodbye to @Autowired: <div>Here’s What to Use Instead</div>';
-
-  private style: any =
-    'width: 100% !important;max-width: 600px !important;display: block !important;margin: 15px auto !important;box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1) !important;transition: transform 0.2s ease-in-out !important';
-
-  postContent: any = `
-  <p><strong>@Autowired</strong> has been a core part of Spring dependency injection for years. However, with the latest updates, developers are encouraged to use <code>constructor injection</code> instead.</p>
-
-
-  <img src="https://blog.pwskills.com/wp-content/uploads/2024/04/Autowired-In-Spring-Boot.jpg" alt="Spring @Autowired">
-
-    <h2>Why is Spring Moving Away from @Autowired?</h2>
-    <ul>
-        <li>Improves **testability**</li>
-        <li>Avoids **reflection-based injection**</li>
-        <li>Ensures **better immutability**</li>
-    </ul>
-
-    <h2>Recommended Approach</h2>
-    <p>Instead of using <code>@Autowired</code>, you should prefer <strong>constructor-based injection</strong>:</p>
-
-    <pre><code>
-    @Service
-    public class UserService {
-        private final UserRepository userRepository;
-
-        public UserService(UserRepository userRepository) {
-            this.userRepository = userRepository;
-        }
-    }
-    </code></pre>
-
-    <h2>Video Explanation</h2>
-    <video src="https://www.youtube.com/watch?v=tX7t45m-4H8"/>
-
-    <p>By using constructor injection, we ensure that dependencies are always available and properly initialized. This makes our code more robust and easier to maintain.</p>
-
-    <p>Want to learn more? Check out the official <a href="https://spring.io/guides" target="_blank">Spring documentation</a>.</p>
-  `; //TODO ad comments in footer
+  likes: number = 0;
+  comments: number = 0;
+  publishedAt: string = '';
+  by: string = ''; //TODO add getter for user
+  postTitle: any = '';
 
   constructor(
     private sanitizer: DomSanitizer,
     private changeDetectorRef: ChangeDetectorRef
   ) {}
+
+  ngOnInit(): void {
+    // this.likes = this.data.likes;
+    // this.comments = this.data.comments;
+    // this.publishedAt = this.data.publishedAt;
+    // this.by = this.data.by;
+    // this.postContent = this.data.htmlContent; //read from api
+    // this.postTitle = this.data.postTitle;
+    this.postContent = this.dummyContent();
+  }
 
   public isFullSize: boolean = false;
 
@@ -94,8 +74,8 @@ export class PostComponent implements AfterViewInit {
     this.changeDetectorRef.detectChanges();
   }
 
-  public saveOrEditPost(postContent: string){
-//TODO encode to byte array
+  public saveOrEditPost(postContent: string) {
+    //TODO encode to byte array
   }
 
   private replaceImageTags() {
@@ -135,5 +115,42 @@ export class PostComponent implements AfterViewInit {
   extractVideoIdFromUrl(url: string): string {
     const videoIdMatch = url.match(GenericConstants.YOUTUBE_REGEX);
     return videoIdMatch ? videoIdMatch[1] : '';
+  }
+
+  private dummyContent(){
+    return `
+  <p><strong>@Autowired</strong> has been a core part of Spring dependency injection for years. However, with the latest updates, developers are encouraged to use <code>constructor injection</code> instead.</p>
+
+
+  <img src="https://blog.pwskills.com/wp-content/uploads/2024/04/Autowired-In-Spring-Boot.jpg" alt="Spring @Autowired">
+
+    <h2>Why is Spring Moving Away from @Autowired?</h2>
+    <ul>
+        <li>Improves **testability**</li>
+        <li>Avoids **reflection-based injection**</li>
+        <li>Ensures **better immutability**</li>
+    </ul>
+
+    <h2>Recommended Approach</h2>
+    <p>Instead of using <code>@Autowired</code>, you should prefer <strong>constructor-based injection</strong>:</p>
+
+    <pre><code>
+    @Service
+    public class UserService {
+        private final UserRepository userRepository;
+
+        public UserService(UserRepository userRepository) {
+            this.userRepository = userRepository;
+        }
+    }
+    </code></pre>
+
+    <h2>Video Explanation</h2>
+    <video src="https://www.youtube.com/watch?v=tX7t45m-4H8"/>
+
+    <p>By using constructor injection, we ensure that dependencies are always available and properly initialized. This makes our code more robust and easier to maintain.</p>
+
+    <p>Want to learn more? Check out the official <a href="https://spring.io/guides" target="_blank">Spring documentation</a>.</p>
+  `;
   }
 }
