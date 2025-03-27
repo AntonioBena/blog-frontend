@@ -1,0 +1,19 @@
+<form [formGroup]="htmlForm">
+  <div class="main-container">
+    <div class="content">
+      <div class="button-container">
+        <div class="text">Write your Blog below</div>
+        <div class="button-row">
+            <button class="b" [disabled]="!htmlForm.get('htmlContent')?.value?.trim()"
+            mat-stroked-button>Save</button>
+            <button class="b" [disabled]="!htmlForm.get('htmlContent')?.value?.trim()"
+            mat-stroked-button>Preview</button>
+        </div>
+      </div>
+      <div class="container">
+        <header class="header"></header>
+        <angular-editor formControlName="htmlContent" [config]="config"></angular-editor>
+      </div>
+    </div>
+  </div>
+</form>
