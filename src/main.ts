@@ -13,4 +13,3 @@ bootstrapApplication(AppComponent, {
     provideHttpClient(withInterceptors([authInterceptor]))
   ]
 }).catch(err => console.error(err));
-

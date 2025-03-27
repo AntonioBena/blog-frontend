@@ -4,4 +4,5 @@ export class RoutesConstants {
   public static readonly ACTIVATE_ACC_ROUTE = 'activate';
   public static readonly MAIN_ROUTE = 'main';
   public static readonly POST_DETAILS = 'post';
+  public static readonly MARKDOWN_EDITOR = 'editor';
 }

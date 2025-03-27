@@ -17,6 +17,6 @@
       <span matTooltip="{{comments}} comments">💬 {{ comments }}</span>
     </div>
     <mat-divider class="divider"></mat-divider>
-    <div #contentContainer [innerHTML]="postContent"></div>
+    <div #contentContainer [innerHTML]="postContent | safeHtml"></div>
   </div>
 </div>

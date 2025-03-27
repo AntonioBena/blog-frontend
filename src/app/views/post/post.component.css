@@ -80,7 +80,7 @@ body {
 } */
 
 .full-size {
-  position: fixed; /* Fix the image position */
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
@@ -89,6 +89,21 @@ body {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  z-index: 9999; /* Ensure it stays on top of other content */
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5); /* Optional for better visibility */
+  z-index: 9999;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.video-container {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%;
+  height: 0;
+}
+
+.video-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
