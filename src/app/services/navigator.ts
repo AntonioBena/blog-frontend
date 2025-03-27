@@ -25,4 +25,8 @@ export class NavigatorService{
   public navigateToMain(){
     return this.router.navigate(['/' + RoutesConstants.MAIN_ROUTE]);
   }
+
+  public navigateToEditor(){
+    return this.router.navigate(['/' + RoutesConstants.MARKDOWN_EDITOR]);
+  }
 }

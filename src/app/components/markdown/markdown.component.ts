@@ -16,6 +16,7 @@ import { Content } from '../../models/content';
 import { PostCategory } from '../../constants/post-category';
 import { PreviewDialogComponent } from '../../views/dialogs/preview-dialog/preview-dialog.component';
 import { NavigatorService } from '../../services/navigator';
+import { ToolBarService } from '../../services/tool-bar-service';
 
 @Component({
   selector: 'app-markdown',
@@ -71,7 +72,7 @@ export class MarkdownComponent implements OnInit {
     ],
   };
 
-  constructor(public dialog: MatDialog,  private fb: FormBuilder, private navigator: NavigatorService) {
+  constructor(public dialog: MatDialog,  private fb: FormBuilder, private navigator: NavigatorService, private toolbar: ToolBarService) {
     this.titleForm = this.fb.group({
       title: ['', [Validators.required]],
       shortContent: ['', [Validators.required]],
@@ -81,9 +82,12 @@ export class MarkdownComponent implements OnInit {
 
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.toolbar.hide();
+  }
 
   public toMain(){
+    this.toolbar.show();
     this.navigator.navigateToMain();
   }
 
@@ -96,6 +100,8 @@ export class MarkdownComponent implements OnInit {
     content.shortContent = this.titleForm.value.shortContent;
     content.htmlContent = this.htmlForm.value.htmlContent;
     console.log("created content: ", content);
+
+    //TODO when successfurl exit and this.toolTab.isWriteing = true;
   }
 
   private getHtmlContent(){

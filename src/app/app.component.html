@@ -2,11 +2,13 @@
   <span style="font-weight: 400;">Blogger</span>
   <span class="example-spacer"></span>
   <div style="display: flex; align-items: center;">
-    <button *ngIf="isWriter" mat-icon-button class="example-icon"
-      matTooltip="Write new post"
-      aria-label="Example icon-button with share icon">
-      <mat-icon>edit_note</mat-icon>
-    </button>
+   <span *ngIf="!isWriteingNew">
+    <button *ngIf="isWriter" mat-icon-button class="example-icon" (click)="toEditor()"
+    matTooltip="Write new post"
+    aria-label="Example icon-button with share icon">
+    <mat-icon>edit_note</mat-icon>
+  </button>
+   </span>
   </div>
   <button mat-icon-button class="example-icon favorite-icon"
   matTooltip="User Profile"

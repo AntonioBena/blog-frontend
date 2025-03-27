@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ToastrService } from './services/toastr.service';
 import { CommonModule } from '@angular/common';
@@ -7,6 +7,8 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import { TokenService } from './services/auth/TokenService';
 import {MatTooltipModule} from '@angular/material/tooltip';
+import { ToolBarService } from './services/tool-bar-service';
+import { NavigatorService } from './services/navigator';
 
 @Component({
   selector: 'app-root',
@@ -33,15 +35,26 @@ export class AppComponent implements OnInit{
   toastrType = "";
   toastrPosition = "";
 
-  constructor(private toastr: ToastrService, private tokenService: TokenService) {
+  constructor(private toastr: ToastrService,
+    private cdRef: ChangeDetectorRef,
+    private tokenService: TokenService,
+    private navigator: NavigatorService,
+    private toolbar: ToolBarService) {
     if(tokenService.checkTokenExists()){
       this.showToolbar = true;
     }else{
-      //this.showToolbar = false;
+      //this.showToolbar = false; TODO
     }
   }
 
+  isWriteingNew = false;
+
   ngOnInit(): void {
+    this.toolbar.isVisible$.subscribe(status => {
+      this.isWriteingNew = status;
+      this.cdRef.detectChanges();
+    });
+
     this.toastr.status.subscribe((msg: string) => {
       this.toastrType = localStorage.getItem("toastrType") || "";
       this.toastrPosition = localStorage.getItem("toastrPosition") || "";
@@ -52,6 +65,10 @@ export class AppComponent implements OnInit{
         this.toastrMsg = msg;
       }
     })
+  }
+
+  toEditor(){
+    this.navigator.navigateToEditor();
   }
 
   closeToast() {
