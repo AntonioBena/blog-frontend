@@ -1,27 +1,29 @@
-import { ChangeDetectorRef, Component, ElementRef, Inject, Input, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  Inject,
+  OnInit,
+  ViewChild,
+  ViewContainerRef,
+  ViewEncapsulation,
+} from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { Content } from '../../../models/content';
-import { GenericConstants } from '../../../constants/app-generic-constants';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
-import { MatTooltip } from '@angular/material/tooltip';
-import { SafeHtmlPipe } from "../../../components/video/safe-html.pipe";
+import { SafeHtmlPipe } from '../../../components/video/safe-html.pipe';
 import { MatDialogActions } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { HtmlProcessor } from '../../../services/html-processor';
 
 @Component({
   selector: 'app-preview-dialog',
-  imports: [
-    MatDividerModule,
-    SafeHtmlPipe,
-    MatDialogActions,
-    MatButtonModule
-],
+  imports: [MatDividerModule, SafeHtmlPipe, MatDialogActions, MatButtonModule],
   templateUrl: './preview-dialog.component.html',
-  styleUrl: './preview-dialog.component.css'
+  styleUrl: './preview-dialog.component.css',
+  encapsulation: ViewEncapsulation.None,
 })
-export class PreviewDialogComponent implements OnInit{
+export class PreviewDialogComponent implements OnInit {
   sanitizedContent!: SafeHtml;
   @ViewChild('contentContainer', { read: ViewContainerRef })
   contentContainer!: ViewContainerRef;
@@ -30,21 +32,26 @@ export class PreviewDialogComponent implements OnInit{
   publishedAt: string = 'Content is in preview mode';
   by: string = ''; //TODO add getter for user
   postTitle: any = '';
-  postContent: any = '';
+  private postContent: any = '';
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any,
-  private htmlProcessor: HtmlProcessor,
+  processedContent: any = '';
+
+  constructor(
+    @Inject(MAT_DIALOG_DATA) public data: any,
+    private htmlProcessor: HtmlProcessor,
     private dialogRef: MatDialog,
     private sanitizer: DomSanitizer,
     private changeDetectorRef: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
+    this.postContent = this.data.object.htmlContent;
     this.postTitle = this.data.object.postTitle;
     this.by = this.data.object.by;
-    this.postContent = this.htmlProcessor.processHtmlInput(this.data.object.htmlContent);
-    console.log("content is passed to preview ", this.data.object);
-
+    this.processedContent = this.htmlProcessor.processHtmlInput(
+      this.postContent
+    );
+    console.log('content is passed to preview ', this.data.object);
   }
 
   closeDialog() {
@@ -58,47 +65,6 @@ export class PreviewDialogComponent implements OnInit{
   }
 
   ngAfterViewInit(): void {
-    this.replaceVideoTags();
     this.changeDetectorRef.detectChanges();
-  }
-
-
-  private replaceImageTags() {
-    this.postContent = this.postContent.replace(
-      GenericConstants.IMAGE_TAG_REGEX,
-      (_match: string, p1: string) => {
-        if (p1.includes('class=')) {
-          return `<img${p1} class="custom-img">`;
-        } else {
-          return `<img${p1} class="custom-img"/>`;
-        }
-      }
-    );
-  }
-
-  private replaceVideoTags() {
-    this.replaceImageTags();
-    const matches = [
-      ...this.postContent.matchAll(GenericConstants.VIDEO_TAG_REGEX),
-    ];
-    let videoId;
-
-    matches.forEach((match) => {
-      const videoUrl = match[1];
-      videoId = this.extractVideoIdFromUrl(videoUrl);
-    });
-
-    this.postContent = this.postContent.replace(
-      GenericConstants.VIDEO_TAG_REGEX,
-      `<div class="video-container"><iframe frameborder="0" allowfullscreen
-      src="https://www.youtube.com/embed/${videoId}">
-      </iframe></div>`
-    );
-    console.log(this.postContent);
-  }
-
-  extractVideoIdFromUrl(url: string): string {
-    const videoIdMatch = url.match(GenericConstants.YOUTUBE_REGEX);
-    return videoIdMatch ? videoIdMatch[1] : '';
   }
 }

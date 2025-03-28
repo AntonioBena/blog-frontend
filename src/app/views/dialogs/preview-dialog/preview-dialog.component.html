@@ -9,7 +9,7 @@
     </div>
     <div class="metadata">{{publishedAt}}</div>
     <mat-divider class="divider"></mat-divider>
-    <div #contentContainer [innerHTML]="postContent | safeHtml"></div>
+    <div #contentContainer [innerHTML]="processedContent | safeHtml"></div>
   </div>
 </div>
 <mat-dialog-actions align="end">

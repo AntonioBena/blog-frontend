@@ -2,19 +2,16 @@ import { Injectable } from '@angular/core';
 import { GenericConstants } from '../constants/app-generic-constants';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class HtmlProcessor {
-
   public processHtmlInput(htmlContent: string) {
     return this.processVideoAndImageTags(htmlContent);
   }
 
   private processVideoAndImageTags(htmlContent: string) {
     let cont1 = this.replaceImageTags(htmlContent);
-    const matches = [
-      ...cont1.matchAll(GenericConstants.VIDEO_TAG_REGEX),
-    ];
+    const matches = [...cont1.matchAll(GenericConstants.VIDEO_TAG_REGEX)];
     let videoId;
 
     matches.forEach((match) => {
@@ -28,7 +25,6 @@ export class HtmlProcessor {
       src="https://www.youtube.com/embed/${videoId}">
       </iframe></div>`
     );
-    console.log("from html processor: ", htmlContent);
     return processedContent;
   }
 
@@ -38,7 +34,7 @@ export class HtmlProcessor {
   }
 
   private replaceImageTags(htmlContent: string) {
-    return htmlContent = htmlContent.replace(
+    return (htmlContent = htmlContent.replace(
       GenericConstants.IMAGE_TAG_REGEX,
       (_match: string, p1: string) => {
         if (p1.includes('class=')) {
@@ -47,6 +43,6 @@ export class HtmlProcessor {
           return `<img${p1} class="custom-img"/>`;
         }
       }
-    );
+    ));
   }
 }

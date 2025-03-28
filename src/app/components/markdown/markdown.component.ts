@@ -1,7 +1,4 @@
-import {
-  Component,
-  Renderer2,
-} from '@angular/core';
+import { Component, Renderer2 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { OnInit, ViewEncapsulation } from '@angular/core';
 import {
@@ -44,7 +41,6 @@ import { ToolBarService } from '../../services/tool-bar-service';
   encapsulation: ViewEncapsulation.None,
 })
 export class MarkdownComponent implements OnInit {
-
   titleForm!: FormGroup;
 
   postCategories = Object.values(PostCategory);
@@ -71,7 +67,7 @@ export class MarkdownComponent implements OnInit {
   config: AngularEditorConfig = {
     editable: true,
     spellcheck: true,
-    height: '15rem',
+    height: '20rem',
     minHeight: '5rem',
     placeholder: 'Enter your main content here...',
     translate: 'no',
