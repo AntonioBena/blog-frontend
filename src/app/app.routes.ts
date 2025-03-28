@@ -5,7 +5,7 @@ import { RegisterComponent } from './views/register/register.component';
 import { MainComponent } from './views/main/main.component';
 import { AcivateComponent } from '../app/views/acivate/acivate.component';
 import { PostComponent } from './views/post/post.component';
-import { MarkdownComponent } from './components/markdown/markdown.component';
+import { MarkdownComponent } from './views/markdown/markdown.component';
 import { UserProfileComponent } from './views/user-profile/user-profile.component';
 
 export const routes: Routes = [

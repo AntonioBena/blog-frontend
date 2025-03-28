@@ -19,7 +19,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatInputModule } from '@angular/material/input';
 import { Content } from '../../models/content';
 import { PostCategory } from '../../constants/post-category';
-import { PreviewDialogComponent } from '../../views/dialogs/preview-dialog/preview-dialog.component';
+import { PreviewDialogComponent } from '../dialogs/preview-dialog/preview-dialog.component';
 import { NavigatorService } from '../../services/navigator';
 import { ToolBarService } from '../../services/tool-bar-service';
 

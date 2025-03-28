@@ -11,7 +11,7 @@ import {
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
-import { SafeHtmlPipe } from '../../../components/video/safe-html.pipe';
+import { SafeHtmlPipe } from '../../../services/safe-html.pipe';
 import { MatDialogActions } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { HtmlProcessor } from '../../../services/html-processor';

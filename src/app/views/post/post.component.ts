@@ -13,7 +13,7 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
 import { SafeHtml } from '@angular/platform-browser';
 import { YouTubePlayerModule } from '@angular/youtube-player';
-import { SafeHtmlPipe } from '../../components/video/safe-html.pipe';
+import { SafeHtmlPipe } from '../../services/safe-html.pipe';
 import { Content } from '../../models/content';
 import { HtmlProcessor } from '../../services/html-processor';
 
