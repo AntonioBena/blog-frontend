@@ -3,7 +3,6 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
-  Inject,
   Input,
   OnInit,
   ViewChild,
@@ -12,12 +11,11 @@ import {
 } from '@angular/core';
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { GenericConstants } from '../../constants/app-generic-constants';
+import { SafeHtml } from '@angular/platform-browser';
 import { YouTubePlayerModule } from '@angular/youtube-player';
 import { SafeHtmlPipe } from '../../components/video/safe-html.pipe';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Content } from '../../models/content';
+import { HtmlProcessor } from '../../services/html-processor';
 
 @Component({
   selector: 'app-post',
@@ -48,8 +46,10 @@ export class PostComponent implements OnInit {
   by: string = ''; //TODO add getter for user
   postTitle: any = '';
 
+  private unprocessedHtmlContent: string = ''; //from api
+
   constructor(
-    private sanitizer: DomSanitizer,
+    private htmlProcessor: HtmlProcessor,
     private changeDetectorRef: ChangeDetectorRef
   ) {}
 
@@ -60,7 +60,7 @@ export class PostComponent implements OnInit {
     // this.by = this.data.by;
     // this.postContent = this.data.htmlContent; //read from api
     // this.postTitle = this.data.postTitle;
-    this.postContent = this.dummyContent();
+    this.unprocessedHtmlContent = this.dummyContent();
   }
 
   public isFullSize: boolean = false;
@@ -70,7 +70,9 @@ export class PostComponent implements OnInit {
   }
 
   ngAfterViewInit(): void {
-    this.replaceVideoTags();
+    this.postContent = this.htmlProcessor.processHtmlInput(
+      this.unprocessedHtmlContent
+    );
     this.changeDetectorRef.detectChanges();
   }
 
@@ -78,46 +80,7 @@ export class PostComponent implements OnInit {
     //TODO encode to byte array
   }
 
-  private replaceImageTags() {
-    this.postContent = this.postContent.replace(
-      GenericConstants.IMAGE_TAG_REGEX,
-      (_match: string, p1: string) => {
-        if (p1.includes('class=')) {
-          return `<img${p1} class="custom-img">`;
-        } else {
-          return `<img${p1} class="custom-img"/>`;
-        }
-      }
-    );
-  }
-
-  private replaceVideoTags() {
-    this.replaceImageTags();
-    const matches = [
-      ...this.postContent.matchAll(GenericConstants.VIDEO_TAG_REGEX),
-    ];
-    let videoId;
-
-    matches.forEach((match) => {
-      const videoUrl = match[1];
-      videoId = this.extractVideoIdFromUrl(videoUrl);
-    });
-
-    this.postContent = this.postContent.replace(
-      GenericConstants.VIDEO_TAG_REGEX,
-      `<div class="video-container"><iframe frameborder="0" allowfullscreen
-      src="https://www.youtube.com/embed/${videoId}">
-      </iframe></div>`
-    );
-    console.log(this.postContent);
-  }
-
-  extractVideoIdFromUrl(url: string): string {
-    const videoIdMatch = url.match(GenericConstants.YOUTUBE_REGEX);
-    return videoIdMatch ? videoIdMatch[1] : '';
-  }
-
-  private dummyContent(){
+  private dummyContent() {
     return `
   <p><strong>@Autowired</strong> has been a core part of Spring dependency injection for years. However, with the latest updates, developers are encouraged to use <code>constructor injection</code> instead.</p>
 

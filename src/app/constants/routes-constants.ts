@@ -5,4 +5,5 @@ export class RoutesConstants {
   public static readonly MAIN_ROUTE = 'main';
   public static readonly POST_DETAILS = 'post';
   public static readonly MARKDOWN_EDITOR = 'editor';
+  public static readonly USER_PROFILE = 'profile';
 }

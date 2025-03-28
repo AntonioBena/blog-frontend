@@ -6,6 +6,7 @@ import { MainComponent } from './views/main/main.component';
 import { AcivateComponent } from '../app/views/acivate/acivate.component';
 import { PostComponent } from './views/post/post.component';
 import { MarkdownComponent } from './components/markdown/markdown.component';
+import { UserProfileComponent } from './views/user-profile/user-profile.component';
 
 export const routes: Routes = [
   { path: RoutesConstants.LOGIN_ROUTE, component: LoginComponent },
@@ -14,5 +15,6 @@ export const routes: Routes = [
   { path: RoutesConstants.MAIN_ROUTE, component: MainComponent }, //TODO add auth guard
   { path: RoutesConstants.POST_DETAILS, component: PostComponent }, //TODO add auth guard
   { path: RoutesConstants.MARKDOWN_EDITOR, component: MarkdownComponent }, //TODO add auth guard
+  { path: RoutesConstants.USER_PROFILE, component: UserProfileComponent }, //TODO add auth guard
   { path: '**', redirectTo: RoutesConstants.LOGIN_ROUTE }
 ];

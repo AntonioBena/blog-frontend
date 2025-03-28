@@ -1,0 +1,29 @@
+.main-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 40px;
+  max-width: 1200px;
+  margin: 0px auto;
+  padding: 20px;
+}
+
+.content {
+  flex: 2;
+  max-width: 700px;
+  min-width: 80%;
+}
+
+.blog-title {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  font-weight: 400;
+}
+.full-width {
+  width: 100%;
+}
+
+.user-info{
+  padding-top: 20px;
+  overflow: hidden;
+}

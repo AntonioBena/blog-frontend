@@ -67,6 +67,16 @@ export class AppComponent implements OnInit{
     })
   }
 
+  toProfile(){
+    this.navigator.navigateToUserProfile();
+    this.toolbar.show();
+  }
+
+  toBlog(){
+    this.navigator.navigateToMain();
+    this.toolbar.show();
+  }
+
   toEditor(){
     this.navigator.navigateToEditor();
   }

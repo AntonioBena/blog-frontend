@@ -29,4 +29,8 @@ export class NavigatorService{
   public navigateToEditor(){
     return this.router.navigate(['/' + RoutesConstants.MARKDOWN_EDITOR]);
   }
+
+  public navigateToUserProfile(){
+    return this.router.navigate(['/' + RoutesConstants.USER_PROFILE]);
+  }
 }

@@ -1,0 +1,45 @@
+<div class="main-container">
+  <div class="content">
+    <h1 class="blog-title">UserName</h1>
+    <nav class="nav">
+      <mat-tab-group (selectedIndexChange)="onTabChange($event)">
+        <mat-tab *ngFor="let tab of userTabs" [label]="tab">
+          <ng-container [ngSwitch]="tab">
+
+            <div *ngSwitchCase="UserConstants.USER_INFO" class="user-info">
+              <form [formGroup]="userInfoGroup" (ngSubmit)="onSubmit()">
+                <mat-form-field class="full-width" appearance="outline">
+                  <mat-label>Name</mat-label>
+                  <input matInput formControlName="name" placeholder="Enter your name">
+                </mat-form-field>
+
+                <mat-form-field class="full-width" appearance="outline">
+                  <mat-label>Last Name</mat-label>
+                  <input matInput formControlName="lastName" placeholder="Enter your name">
+                </mat-form-field>
+              
+                <mat-form-field class="full-width" appearance="outline">
+                  <mat-label>Email</mat-label>
+                  <input matInput formControlName="email" placeholder="Enter your email">
+                </mat-form-field>
+              
+                <button mat-raised-button color="primary" type="submit" [disabled]="userInfoGroup.invalid">
+                  Submit
+                </button>
+              </form>
+            </div>
+
+            <div *ngSwitchCase="UserConstants.POSTS">
+              <p>Here will be the list of posts</p>
+            </div>
+
+            <div *ngSwitchCase="UserConstants.STATS">
+              <p>Statistics will be shown here</p>
+              <canvas id="myChart"></canvas>
+            </div>
+
+          </ng-container>
+        </mat-tab>
+      </mat-tab-group>
+    </nav>
+  </div>

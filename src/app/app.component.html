@@ -1,5 +1,5 @@
 <mat-toolbar *ngIf="showToolbar" class="toolbar">
-  <span style="font-weight: 400;">Blogger</span>
+  <span style="font-weight: 400; cursor: pointer;" (click)="toBlog()" >Blogger</span>
   <span class="example-spacer"></span>
   <div style="display: flex; align-items: center;">
    <span *ngIf="!isWriteingNew">
@@ -10,7 +10,7 @@
   </button>
    </span>
   </div>
-  <button mat-icon-button class="example-icon favorite-icon"
+  <button mat-icon-button class="example-icon favorite-icon" (click)="toProfile()"
   matTooltip="User Profile"
   aria-label="Example icon-button with heart icon">
     <mat-icon>person</mat-icon>

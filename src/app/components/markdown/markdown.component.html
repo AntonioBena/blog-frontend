@@ -16,28 +16,24 @@
         <div class="form-field-container">
           <form [formGroup]="titleForm">
             <mat-form-field appearance="outline" class="full-width" #category>
-              <mat-label>Select Post Category</mat-label>
+              <mat-label>Select Blog Post Category</mat-label>
               <mat-select formControlName="category" required>
                 <mat-option *ngFor="let category of postCategories" [value]="category">
                   {{ category }}
                 </mat-option>
               </mat-select>
-              <mat-hint>Blog post category</mat-hint>
             </mat-form-field>
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Title</mat-label>
-              <mat-hint>Put your Title here</mat-hint>
-              <input matInput formControlName="title" required />
+              <input matInput formControlName="title" required placeholder="Your main title" />
             </mat-form-field>
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Image url</mat-label>
-              <input matInput formControlName="shortContentImageUrl" required />
-              <mat-hint>Put your image url here, this will be visible in the main page</mat-hint>
+              <input matInput formControlName="shortContentImageUrl" required placeholder="Put your image url here"/>
             </mat-form-field>
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Short content</mat-label>
-              <mat-hint>Put your short content here, this will be visible in the main page</mat-hint>
-              <textarea matInput formControlName="shortContent" required></textarea>
+              <textarea matInput formControlName="shortContent" required placeholder="Put your short content here, something that will catch the viewer's eye"></textarea>
             </mat-form-field>
           </form>
         </div>
