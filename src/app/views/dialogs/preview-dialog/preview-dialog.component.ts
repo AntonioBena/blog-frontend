@@ -8,6 +8,7 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { SafeHtmlPipe } from "../../../components/video/safe-html.pipe";
 import { MatDialogActions } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
+import { HtmlProcessor } from '../../../services/html-processor';
 
 @Component({
   selector: 'app-preview-dialog',
@@ -32,6 +33,7 @@ export class PreviewDialogComponent implements OnInit{
   postContent: any = '';
 
   constructor(@Inject(MAT_DIALOG_DATA) public data: any,
+  private htmlProcessor: HtmlProcessor,
     private dialogRef: MatDialog,
     private sanitizer: DomSanitizer,
     private changeDetectorRef: ChangeDetectorRef
@@ -40,7 +42,7 @@ export class PreviewDialogComponent implements OnInit{
   ngOnInit(): void {
     this.postTitle = this.data.object.postTitle;
     this.by = this.data.object.by;
-    this.postContent = this.data.object.htmlContent;
+    this.postContent = this.htmlProcessor.processHtmlInput(this.data.object.htmlContent);
     console.log("content is passed to preview ", this.data.object);
 
   }
