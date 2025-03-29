@@ -8,9 +8,11 @@ export class BlogPost {
   shortContentImageUrl!: string;
   category!: PostCategory;
   htmlContent!: Uint8Array;
+  publishedAt!: string;
   likeCount!: number;
   commentCount!: number;
   viewCount!: number;
   comments!: Comment[];
   likedBy!: User[];
+  postOwner!: User;
 }

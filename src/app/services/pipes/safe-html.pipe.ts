@@ -1,7 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import DOMPurify from 'isomorphic-dompurify';
-import { HtmlSanitizationConstants } from '../constants/html-sanitization-constants';
+import { HtmlSanitizationConstants } from '../../constants/html-sanitization-constants';
 
 @Pipe({
   name: 'safeHtml',

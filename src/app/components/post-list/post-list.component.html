@@ -1,13 +1,15 @@
 <div class="post-list">
   <div *ngFor="let post of posts" class="post" (click)="onPostClick(post)">
     <div class="post-content">
+      <p class="posted-by">by {{post.postOwner.firstName}} {{post.postOwner.lastName}}</p>
+      <p class="published-at">Published on {{post.publishedAt | date: 'MMMM d, y' }}</p>
       <h3 class="post-title">{{ post.title }}</h3>
-      <p class="post-text">{{ post.content.slice(0, 200) }}...</p>
+      <p class="post-text">{{ post.shortContent | truncate:200 }}</p>
       <div class="post-footer">
-        <span matTooltip="{{post.likes}} reactions">❤️ {{ post.likes }}</span>
-        <span  matTooltip="{{post.comments}} comments">💬 {{ post.comments }}</span>
+        <span class="reaction" matTooltip="{{post.likeCount}} reactions">❤️ {{ post.likeCount }}</span>
+        <span class="comment" matTooltip="{{post.commentCount}} comments">💬 {{ post.commentCount }}</span>
       </div>
     </div>
-    <img [src]="post.imageUrl" alt="Post Image" class="post-image">
+    <img [src]="post.shortContentImageUrl" loading="lazy" alt="Post Image" class="post-image">
   </div>
 </div>

@@ -5,6 +5,7 @@ import { Observable } from "rxjs";
 import { BlogPost } from "../../models/blog-post";
 import { LikeRequest } from "../../models/requests/like-request";
 import { Page } from "../../models/page";
+import { PostCategory } from '../../constants/post-category';
 
 @Injectable({
   providedIn: 'root'
@@ -23,8 +24,9 @@ export class BlogPostService {
     return this.http.post(`${this.apiUrl}`, formData);
   }
 
-  getAllShortBlogPosts(page: number, size: number): Observable<Page<BlogPost>> { //TODO this will get short version of posts
-    return this.http.get<Page<BlogPost>>(`${this.apiUrl}?page=${page}&size=${size}`);
+  getAllShortBlogPosts(page: number, size: number, category: PostCategory): Observable<Page<BlogPost>> {
+    var c = category.toUpperCase();
+    return this.http.get<Page<BlogPost>>(`${this.apiUrl}/all?page=${page}&size=${size}&category=${c}`);
   }
 
   getBlogPost(postId: number, userId: number): Observable<BlogPost> { //TODO this will increment view count, extended version of post

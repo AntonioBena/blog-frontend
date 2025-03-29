@@ -4,6 +4,19 @@
   gap: 20px;
 }
 
+.posted-by{
+  font-size:small
+}
+.published-at{
+  font-size: small;
+}
+.reaction{
+
+}
+.comment{
+  padding-left: 5px;
+}
+
 .post {
   display: flex;
   align-items: center;
