@@ -9,7 +9,7 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { SafeHtmlPipe } from '../../../services/safe-html.pipe';
 import { MatDialogActions } from '@angular/material/dialog';
@@ -39,7 +39,7 @@ export class PreviewDialogComponent implements OnInit {
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
     private htmlProcessor: HtmlProcessor,
-    private dialogRef: MatDialog,
+    private dialogRef: MatDialogRef<PreviewDialogComponent>,
     private sanitizer: DomSanitizer,
     private changeDetectorRef: ChangeDetectorRef
   ) {}
@@ -55,7 +55,7 @@ export class PreviewDialogComponent implements OnInit {
   }
 
   closeDialog() {
-    this.dialogRef.closeAll();
+    this.dialogRef.close();
   }
 
   public isFullSize: boolean = false;

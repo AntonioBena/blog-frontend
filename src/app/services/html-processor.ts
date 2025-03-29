@@ -5,7 +5,7 @@ import { GenericConstants } from '../constants/app-generic-constants';
   providedIn: 'root',
 })
 export class HtmlProcessor {
-  public processHtmlInput(htmlContent: string) {
+  public processHtmlInput(htmlContent: any) {
     return this.processVideoAndImageTags(htmlContent);
   }
 

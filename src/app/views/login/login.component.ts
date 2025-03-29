@@ -69,7 +69,7 @@ export class LoginComponent {
                 'Please check email and password'
               );
             } else if (error.status === StatusCodes.Unauthorized) {
-              this.toastr.showToastTc(ToastType.ERROR, 'User not authorized!');
+              this.toastr.showToastTc(ToastType.ERROR, 'User can not Login!');
             }
             console.error('Login error:');
             return throwError(

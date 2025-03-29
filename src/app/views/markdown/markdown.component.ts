@@ -1,4 +1,4 @@
-import { Component, Renderer2 } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { OnInit, ViewEncapsulation } from '@angular/core';
 import {
@@ -21,7 +21,15 @@ import { Content } from '../../models/content';
 import { PostCategory } from '../../constants/post-category';
 import { PreviewDialogComponent } from '../dialogs/preview-dialog/preview-dialog.component';
 import { NavigatorService } from '../../services/navigator';
-import { ToolBarService } from '../../services/tool-bar-service';
+import { BlogPostService } from '../../services/backend/blog-post-service';
+import { catchError, throwError } from 'rxjs';
+import { BlogPost } from '../../models/blog-post';
+import { ToastrService } from '../../services/toastr.service';
+import { ToastType } from '../../constants/toast-types';
+import { StatusCodes } from '../../constants/http-status-codes';
+import { HtmlProcessor } from '../../services/html-processor';
+import { HtmlSanitizer } from '../../services/sanitizer';
+import { ApiConstants } from '../../constants/api-constants';
 
 @Component({
   selector: 'app-markdown',
@@ -50,11 +58,13 @@ export class MarkdownComponent implements OnInit {
   });
 
   constructor(
-    private renderer: Renderer2,
+    private sanitizer: HtmlSanitizer,
+    private htmlProcessor: HtmlProcessor,
+    private toastr: ToastrService,
+    private blogService: BlogPostService,
     public dialog: MatDialog,
     private fb: FormBuilder,
-    private navigator: NavigatorService,
-    private toolbar: ToolBarService
+    private navigator: NavigatorService
   ) {
     this.titleForm = this.fb.group({
       title: ['', [Validators.required]],
@@ -92,28 +102,66 @@ export class MarkdownComponent implements OnInit {
   };
 
   ngOnInit() {
-    this.toolbar.hide();
+    //this.toolbar.hide();
   }
 
   public toMain() {
-    this.toolbar.show();
     this.navigator.navigateToMain();
   }
 
   public post() {
-    var content = new Content();
-    content.by = 'nepoznati pisac';
-    content.category = this.titleForm.value.category;
-    content.postTitle = this.titleForm.value.title;
-    content.image = this.titleForm.value.shortContentImageUrl;
-    content.shortContent = this.titleForm.value.shortContent;
-    content.htmlContent = this.htmlForm.value.htmlContent;
-    console.log('created content: ', content);
+    if (!this.titleForm.valid) {
+      this.toastr.showToastTc(ToastType.ERROR, 'All the fialed are mandatory');
+    }
 
-    //TODO when successfurl exit and this.toolTab.isWriteing = true;
+    let blogPost = new BlogPost();
+    blogPost.title = this.titleForm.value.title;
+    blogPost.shortContent = this.titleForm.value.shortContent;
+    let category = this.titleForm.value.category;
+    blogPost.category = category.toUpperCase();
+    blogPost.shortContentImageUrl = this.titleForm.value.shortContentImageUrl;
+
+    var cleanHtml = this.sanitizer.sanitize(this.htmlForm.value.htmlContent);
+
+    const file = new File([cleanHtml], `blogpost.html`, {
+      type: ApiConstants.FILE_TYPE,
+    });
+
+    this.blogService
+      .uploadAndPublishBlogPost(blogPost, file)
+      .pipe(
+        catchError((error) => {
+          if (error.status === StatusCodes.BadRequest) {
+            this.toastr.showToastTc(
+              ToastType.ERROR,
+              'Please check your inputs'
+            );
+          }
+
+          if (
+            error.status !== StatusCodes.Created &&
+            error.status !== StatusCodes.Success
+          ) {
+            console.error('Blog post creation error:', error);
+            this.toastr.showToastTc(
+              ToastType.ERROR,
+              'There was an error uploading your blog post'
+            );
+          }
+          return throwError(
+            () => new Error('Create blog post error: ' + error)
+          );
+        })
+      )
+      .subscribe(() => {
+        this.toastr.showToastTc(ToastType.SUCCESS,
+          'Blog post successfully posted!'
+        );
+        this.navigator.navigateToMain();
+      });
   }
 
-  private getHtmlContent() {
+  private getPreviewHtmlContent() {
     var content = new Content();
     content.by = 'nepoznati pisac';
     content.category = this.titleForm.value.category;
@@ -124,20 +172,16 @@ export class MarkdownComponent implements OnInit {
     return content;
   }
 
-  print(content: any) {
-    console.log(content);
-  }
-
   public preview() {
     if (!this.titleForm.valid) {
       return; //TODO add some kind of message
     }
 
     this.dialog.open(PreviewDialogComponent, {
-      width: 'auto',
-      maxWidth: 'none',
+      width: '900px',
+      maxHeight: '80vh',
       data: {
-        object: this.getHtmlContent(),
+        object: this.getPreviewHtmlContent(),
       },
     });
   }
