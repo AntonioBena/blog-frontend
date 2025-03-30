@@ -27,6 +27,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatListModule} from '@angular/material/list';
 import { AuthService } from '../../services/auth/AuthService';
+import { NavigatorService } from '../../services/navigator';
 
 @Component({
   selector: 'app-post',
@@ -73,7 +74,8 @@ export class PostComponent implements OnInit {
     private blogService: BlogPostService,
     private changeDetectorRef: ChangeDetectorRef,
     public route: ActivatedRoute,
-    private authService: AuthService
+    private authService: AuthService,
+    private navigator: NavigatorService
   ) {
     route.params.subscribe((params) => {
       this.id = params['id'];
@@ -175,6 +177,14 @@ export class PostComponent implements OnInit {
     }else{
       this.canEdit = false;
     }
+  }
+
+  public deletePost(){
+    console.log("delete")
+  }
+
+  public editPost(){
+    this.navigator.navigateToEditor(this.selectedPost, this.postContent);
   }
 
   private async getPostHtmlContent(id: number) {

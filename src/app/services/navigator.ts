@@ -3,6 +3,7 @@ import { Router } from "@angular/router";
 import { RoutesConstants } from '../constants/routes-constants';
 import { ToolBarService } from "./tool-bar-service";
 import { TokenService } from './auth/TokenService';
+import { BlogPost } from "../models/blog-post";
 
 
 @Injectable({
@@ -33,9 +34,15 @@ export class NavigatorService{
     return this.router.navigate(['/' + RoutesConstants.MAIN_ROUTE]);
   }
 
-  public navigateToEditor(){
+  public navigateToEditor(post: any, content: any){
     this.toolbar.hide();
-    return this.router.navigate(['/' + RoutesConstants.MARKDOWN_EDITOR]);
+    return this.router.navigate(['/' + RoutesConstants.MARKDOWN_EDITOR],
+      {
+        queryParams: {
+          data: JSON.stringify(post),
+          content: content
+        }
+      });
   }
 
   public navigateToUserProfile(){

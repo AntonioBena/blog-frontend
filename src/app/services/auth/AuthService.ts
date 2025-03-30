@@ -48,8 +48,6 @@ export class AuthService {
 
     const decodedToken: any = this.jwtHelper.decodeToken(token);
 
-    console.log("DECODED TOKEN: ", decodedToken);
-
     const roles = decodedToken?.ROLES || [];
     if (roles.length > 0) {
       return roles[0]?.authority || null;

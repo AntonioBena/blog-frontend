@@ -86,7 +86,7 @@ export class AppComponent implements OnInit{
   }
 
   toEditor(){
-    this.navigator.navigateToEditor();
+    this.navigator.navigateToEditor(null, null);
   }
 
   closeToast() {

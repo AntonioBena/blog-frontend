@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { OnInit, ViewEncapsulation } from '@angular/core';
 import {
@@ -27,9 +27,9 @@ import { BlogPost } from '../../models/blog-post';
 import { ToastrService } from '../../services/toastr.service';
 import { ToastType } from '../../constants/toast-types';
 import { StatusCodes } from '../../constants/http-status-codes';
-import { HtmlProcessor } from '../../services/html-processor';
 import { HtmlSanitizer } from '../../services/sanitizer';
 import { ApiConstants } from '../../constants/api-constants';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-markdown',
@@ -58,12 +58,14 @@ export class MarkdownComponent implements OnInit {
   });
 
   constructor(
+    private route: ActivatedRoute,
     private sanitizer: HtmlSanitizer,
     private toastr: ToastrService,
     private blogService: BlogPostService,
     public dialog: MatDialog,
     private fb: FormBuilder,
-    private navigator: NavigatorService
+    private navigator: NavigatorService,
+    private cdRef: ChangeDetectorRef
   ) {
     this.titleForm = this.fb.group({
       title: ['', [Validators.required]],
@@ -100,8 +102,42 @@ export class MarkdownComponent implements OnInit {
     ],
   };
 
+  private givenPost!: BlogPost;
+  public givenContent!: string;
+
   ngOnInit() {
-    //this.toolbar.hide();
+    this.route.queryParams.subscribe((params) => {
+      if (params['data']) {
+        this.givenPost = JSON.parse(params['data']);
+
+        let postCategory = this.capitalizeFirstLetter(this.givenPost.category);
+
+        this.titleForm = this.fb.group({
+          title: this.givenPost.title,
+          shortContent: this.givenPost.shortContent,
+          shortContentImageUrl: this.givenPost.shortContentImageUrl,
+          category: this.getEnumValue(postCategory)
+        });
+      }
+      if (params['content']) {
+        this.givenContent = params['content'];
+
+        this.htmlForm.setValue({
+          htmlContent: this.givenContent,
+        });
+
+        this.cdRef.detectChanges();
+      }
+    });
+  }
+
+  private capitalizeFirstLetter(str: string): string {
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  }
+
+  private getEnumValue(category: string): PostCategory {
+    const enumValue = PostCategory[category as keyof typeof PostCategory];
+    return enumValue || category as PostCategory;
   }
 
   public toMain() {
@@ -127,25 +163,29 @@ export class MarkdownComponent implements OnInit {
     });
 
     this.blogService
-    .uploadAndPublishBlogPost(blogPost, file)
-    .pipe(
-      catchError((error) => {
-        if (error.status === StatusCodes.BadRequest) {
-          this.toastr.showToastTc(ToastType.ERROR,'Please check your inputs');
-        }
-        console.error('Error creating blog post');
-        this.toastr.showToastTc(ToastType.ERROR,'Error creating blog post');
-        return throwError(() => new Error('Error creating blog post ' + error));
-      })
-    )
-    .subscribe(() => {
-      this.toastr.showToastTc(
-        ToastType.SUCCESS,
-        'Blog post successfully posted!'
-      );
-      this.navigator.navigateToMain();
-    });
-
+      .uploadAndPublishBlogPost(blogPost, file)
+      .pipe(
+        catchError((error) => {
+          if (error.status === StatusCodes.BadRequest) {
+            this.toastr.showToastTc(
+              ToastType.ERROR,
+              'Please check your inputs'
+            );
+          }
+          console.error('Error creating blog post');
+          this.toastr.showToastTc(ToastType.ERROR, 'Error creating blog post');
+          return throwError(
+            () => new Error('Error creating blog post ' + error)
+          );
+        })
+      )
+      .subscribe(() => {
+        this.toastr.showToastTc(
+          ToastType.SUCCESS,
+          'Blog post successfully posted!'
+        );
+        this.navigator.navigateToMain();
+      });
   }
 
   private getPreviewHtmlContent() {

@@ -33,8 +33,9 @@
           </div>
         </mat-tab>
 
-        <mat-tab *ngIf="userRole === 'WRITER'" [label]="UserConstants.POSTS">
-          <p>Here will be the list of posts</p>
+        <mat-tab *ngIf="userRole === 'WRITER'"
+        [label]="UserConstants.POSTS">
+        <app-post-list [posts]="posts"></app-post-list>
         </mat-tab>
 
         <mat-tab *ngIf="userRole === 'WRITER'" [label]="UserConstants.STATS">

@@ -20,6 +20,10 @@ import { UserDto } from '../../models/user';
 import { Role } from '../../models/role';
 import { MatSelectModule } from '@angular/material/select';
 import { AuthService } from '../../services/auth/AuthService';
+import { BlogPost } from '../../models/blog-post';
+import { PostListComponent } from '../../components/post-list/post-list.component';
+import { BlogPostService } from '../../services/backend/blog-post-service';
+import { StatusCodes } from '../../constants/http-status-codes';
 
 @Component({
   selector: 'app-user-profile',
@@ -32,6 +36,7 @@ import { AuthService } from '../../services/auth/AuthService';
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
+    PostListComponent
   ],
   templateUrl: './user-profile.component.html',
   styleUrl: './user-profile.component.css',
@@ -42,15 +47,19 @@ export class UserProfileComponent {
   userTabs = Object.values(UserConstants);
   selectedTab: UserConstants = UserConstants.USER_INFO;
 
+  public posts: BlogPost[] = [];
+
   public userRole: string | null = null;
-
   public currentUser = new UserDto();
-
   public selectedRole = Role.READER;
   Role = Role;
 
   onTabChange(index: number) {
     this.selectedTab = this.userTabs[index] as UserConstants;
+
+    if(this.selectedTab === UserConstants.POSTS){
+      this.getMyPosts(0,10)
+    }
   }
 
   constructor(
@@ -58,7 +67,8 @@ export class UserProfileComponent {
     private userService: UserService,
     private navigator: NavigatorService,
     private fb: FormBuilder,
-    private authService: AuthService
+    private authService: AuthService,
+    private blogService: BlogPostService,
   ) {
     this.userRole = this.authService.getUserRole();
     this.getCurrentUser();
@@ -103,6 +113,24 @@ export class UserProfileComponent {
             this.navigator.navigateToLogin();
         }
         this.toastr.showToastTc(ToastType.SUCCESS, 'Successfully updated Profile!');
+      });
+  }
+
+  public getMyPosts(page: number, size:number){
+    console.log('getting all blog posts');
+    this.blogService
+      .getPostsByAuthor(page, size)
+      .pipe(
+        catchError((error) => {
+          if (error.status === StatusCodes.BadRequest || error.status === StatusCodes.InternalServerError) {
+            this.toastr.showToastTc(ToastType.ERROR, 'Can not get blog posts');
+          }
+          return throwError(() => new Error('Can not get blog posts ' + error));
+        })
+      )
+      .subscribe((resp) => {
+        console.log('gettered blog posts ', resp);
+        this.posts = resp.content;
       });
   }
 

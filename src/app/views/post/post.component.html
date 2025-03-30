@@ -18,11 +18,18 @@
         </span>
       </div>
 
-      <button *ngIf="userRole === 'WRITER' && canEdit" mat-icon-button class="example-icon" matTooltip="Edit post"
-        aria-label="Example icon-button with share icon">
-        <mat-icon>edit_note</mat-icon>
-      </button>
-
+      <div class="example-icon">
+        <button *ngIf="userRole === 'WRITER' && canEdit" (click)="deletePost()"
+        mat-icon-button class="example-icon" matTooltip="Delete post"
+          aria-label="Example icon-button with share icon">
+          <mat-icon>delete_sweep</mat-icon>
+        </button>
+        <button *ngIf="userRole === 'WRITER' && canEdit" (click)="editPost()"
+        mat-icon-button  matTooltip="Edit post"
+          aria-label="Example icon-button with share icon">
+          <mat-icon>edit_note</mat-icon>
+        </button>
+      </div>
 
     </div>
     <mat-divider class="divider"></mat-divider>

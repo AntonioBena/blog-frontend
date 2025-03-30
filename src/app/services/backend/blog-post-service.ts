@@ -28,6 +28,10 @@ export class BlogPostService {
     return this.http.get<Page<BlogPost>>(`${this.apiUrl}/all?page=${page}&size=${size}&category=${c}`);
   }
 
+  getPostsByAuthor(page: number, size: number){
+    return this.http.get<Page<BlogPost>>(`${this.apiUrl}/all/author?page=${page}&size=${size}`);
+  }
+
   getBlogPost(postId: number): Observable<BlogPost> {
     return this.http.get<BlogPost>(`${this.apiUrl}/${postId}`);
   }
