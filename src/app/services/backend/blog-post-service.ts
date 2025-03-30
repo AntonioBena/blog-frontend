@@ -1,13 +1,10 @@
-import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { ApiConstants } from "../../constants/api-constants";
 import { Observable } from "rxjs";
 import { BlogPost } from "../../models/blog-post";
-import { LikeRequest } from "../../models/requests/like-request";
 import { Page } from "../../models/page";
 import { PostCategory } from '../../constants/post-category';
-import { BlogComment } from "../../models/comment";
-import { TokenService } from "../auth/TokenService";
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +13,7 @@ export class BlogPostService {
 
   private apiUrl = ApiConstants.BASE_BLOG_POST_URL;
 
-  constructor(private http: HttpClient, private tokenService: TokenService) {}
+  constructor(private http: HttpClient) {}
 
   uploadAndPublishBlogPost(blogPost: BlogPost, htmlFile: File) {
     const formData = new FormData();

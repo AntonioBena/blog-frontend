@@ -26,6 +26,7 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatListModule} from '@angular/material/list';
+import { AuthService } from '../../services/auth/AuthService';
 
 @Component({
   selector: 'app-post',
@@ -52,7 +53,11 @@ import { MatListModule} from '@angular/material/list';
 export class PostComponent implements OnInit {
   private id!: number;
   public postContent: string = '';
-  public selectedPost!: any;
+  public selectedPost: any = [];
+
+  public userRole: string | null = null;
+  public isAuthenticated = false;
+  public canEdit = false;
 
   commentForm: FormGroup;
 
@@ -67,7 +72,8 @@ export class PostComponent implements OnInit {
     private toastr: ToastrService,
     private blogService: BlogPostService,
     private changeDetectorRef: ChangeDetectorRef,
-    public route: ActivatedRoute
+    public route: ActivatedRoute,
+    private authService: AuthService
   ) {
     route.params.subscribe((params) => {
       this.id = params['id'];
@@ -76,9 +82,11 @@ export class PostComponent implements OnInit {
     this.commentForm = this.fb.group({
       comment: ['', [Validators.required]],
     });
+
   }
 
   async ngOnInit(): Promise<void> {
+    this.userRole = this.authService.getUserRole();
    this.fetchPost(this.id);
    await this.getPostHtmlContent(this.id);
   }
@@ -94,12 +102,12 @@ export class PostComponent implements OnInit {
             this.toastr.showToastTc(ToastType.ERROR, 'Can not like at this moment, please try again later');
           }
           return throwError(
-            () => new Error('Can not get statistics ' + error)
+            () => new Error('Can not like at this moment ' + error)
           );
         })
       )
       .subscribe((resp) => {
-        console.log('gettered sttistics ', resp);
+        console.log('Liked ', resp);
         this.selectedPost.likeCount = resp;
       });
   }
@@ -152,11 +160,20 @@ export class PostComponent implements OnInit {
           })
         )
       );
-      console.log(resp);
+      console.log(resp)
+      this.setCanEdit(resp);
       return resp;
     } catch (error) {
       console.error('Error getting blog post:', error);
       throw error;
+    }
+  }
+
+  private setCanEdit(resp: BlogPost){
+    if(resp.postOwner.email === this.authService.getAuthenticatedUserInfo()){
+      this.canEdit = true;
+    }else{
+      this.canEdit = false;
     }
   }
 
@@ -177,7 +194,6 @@ export class PostComponent implements OnInit {
       );
 
       this.postContent = htmlContent;
-      console.log("Fetched HTML content:", htmlContent);
     } catch (error) {
       console.error('Error fetching HTML content:', error);
     }

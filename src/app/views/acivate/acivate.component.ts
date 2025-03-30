@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -19,6 +19,7 @@ import { catchError, throwError } from 'rxjs';
 import { ToastType } from '../../constants/toast-types';
 import { StatusCodes } from '../../constants/http-status-codes';
 import { NavigatorService } from '../../services/navigator';
+import { TokenService } from '../../services/auth/TokenService';
 @Component({
   selector: 'app-acivate',
   imports: [
@@ -33,16 +34,25 @@ import { NavigatorService } from '../../services/navigator';
   templateUrl: './acivate.component.html',
   styleUrl: './acivate.component.css',
 })
-export class AcivateComponent {
+export class AcivateComponent implements OnInit {
   email: string = '';
   otpForm: FormGroup;
+
+  ngOnInit(): void {
+    if (this.authService.isAuthenticated()) {
+      this.navigator.navigateToMain();
+    }else{
+      this.tokenService.removeToken();
+    }
+  }
 
   constructor(
     private fb: FormBuilder,
     private navigator: NavigatorService,
     private authService: AuthService,
     private toastr: ToastrService,
-    public route: ActivatedRoute
+    public route: ActivatedRoute,
+    private tokenService: TokenService
   ) {
     route.params.subscribe((params) => {
       this.email = params['data'];

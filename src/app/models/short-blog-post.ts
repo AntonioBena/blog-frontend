@@ -1,4 +1,4 @@
-import { User } from "./user";
+import { UserDto } from "./user";
 
 export interface BlogPost {
   id: number;

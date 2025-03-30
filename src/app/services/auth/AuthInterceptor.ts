@@ -8,7 +8,6 @@ import { TokenService } from './TokenService';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const token = localStorage.getItem(ApiConstants.TOKEN);
-  console.debug("token from local storage is= " + token);
 
   const navigator = inject(NavigatorService);
   const tokenService = inject(TokenService);

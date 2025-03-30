@@ -1,5 +1,5 @@
 import { PostCategory } from "../constants/post-category";
-import { User } from "./user";
+import { UserDto } from "./user";
 
 export class BlogPost {
   id!: number;
@@ -13,6 +13,6 @@ export class BlogPost {
   commentCount!: number;
   viewCount!: number;
   comments!: Comment[];
-  likedBy!: User[];
-  postOwner!: User;
+  likedBy!: UserDto[];
+  postOwner!: UserDto;
 }

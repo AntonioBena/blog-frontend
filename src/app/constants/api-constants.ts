@@ -10,4 +10,5 @@ export class ApiConstants {
   public static readonly TOKEN = "auth_token";
 
   public static readonly BASE_BLOG_POST_URL = 'http://localhost:8080/api/v1/blog';
+  public static readonly USER_DETAILS_URL = 'http://localhost:8080/api/v1/user';
 }

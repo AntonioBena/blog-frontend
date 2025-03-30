@@ -9,6 +9,7 @@ import { TokenService } from './services/auth/TokenService';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import { ToolBarService } from './services/tool-bar-service';
 import { NavigatorService } from './services/navigator';
+import { AuthService } from './services/auth/AuthService';
 
 @Component({
   selector: 'app-root',
@@ -27,31 +28,35 @@ import { NavigatorService } from './services/navigator';
 export class AppComponent implements OnInit{
   title = 'blog';
 
-  showToolbar = true; //TODO auth check logic
-  isWriter = true; //TODO writer check logic
+  public userRole: string | null = null;
+  public isAuthenticated = false;
 
   showToast = false;
   toastrMsg = "";
   toastrType = "";
   toastrPosition = "";
 
-  constructor(private toastr: ToastrService,
+  constructor(
+    private authService: AuthService,
+    private toastr: ToastrService,
     private cdRef: ChangeDetectorRef,
-    private tokenService: TokenService,
     private navigator: NavigatorService,
     private toolbar: ToolBarService) {
-    if(tokenService.checkTokenExists()){
-      this.showToolbar = true;
-    }else{
-      //this.showToolbar = false; TODO
-    }
   }
 
-  isWriteingNew = false;
+  isWritingNew = false;
+
 
   ngOnInit(): void {
+    this.authService.authState$.subscribe(isAuthenticated => {
+      this.isAuthenticated = isAuthenticated;
+      if (this.isAuthenticated) {
+        this.userRole = this.authService.getUserRole();
+      }
+    });
+
     this.toolbar.isVisible$.subscribe(status => {
-      this.isWriteingNew = status;
+      this.isWritingNew = status;
       this.cdRef.detectChanges();
     });
 
@@ -67,14 +72,17 @@ export class AppComponent implements OnInit{
     })
   }
 
+  public logout(){
+    this.authService.logout();
+    this.navigator.navigateToLogin();
+  }
+
   toProfile(){
     this.navigator.navigateToUserProfile();
-    this.toolbar.show();
   }
 
   toBlog(){
     this.navigator.navigateToMain();
-    this.toolbar.show();
   }
 
   toEditor(){

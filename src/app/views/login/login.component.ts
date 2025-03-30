@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -33,8 +33,17 @@ import { emailValidator } from '../../validation/email-validator';
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   loginForm: FormGroup;
+
+  ngOnInit(): void {
+    if (this.authService.isAuthenticated()) {
+      this.navigator.navigateToMain();
+    }else{
+      this.authService.setAuthState(false);
+      this.tokenService.removeToken();
+    }
+  }
 
   constructor(
     private fb: FormBuilder,
@@ -81,6 +90,7 @@ export class LoginComponent {
           this.toastr.showToastTc(ToastType.SUCCESS, 'Login succcessful');
           console.log('Login Successful:');
           this.tokenService.token = data.token as string;
+          this.authService.setAuthState(true);
           this.navigator.navigateToMain();
         });
     }

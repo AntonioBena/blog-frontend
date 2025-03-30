@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -18,6 +18,7 @@ import { NavigatorService } from '../../services/navigator';
 import { ToastType } from '../../constants/toast-types';
 import { StatusCodes } from '../../constants/http-status-codes';
 import { emailValidator } from '../../validation/email-validator';
+import { TokenService } from '../../services/auth/TokenService';
 
 @Component({
   selector: 'app-register',
@@ -32,14 +33,23 @@ import { emailValidator } from '../../validation/email-validator';
   templateUrl: './register.component.html',
   styleUrl: './register.component.css',
 })
-export class RegisterComponent {
+export class RegisterComponent implements OnInit{
   registerForm: FormGroup;
+
+  ngOnInit(): void {
+    if (this.authService.isAuthenticated()) {
+      this.navigator.navigateToMain();
+    }else{
+      this.tokenService.removeToken();
+    }
+  }
 
   constructor(
     private fb: FormBuilder,
     private navigator: NavigatorService,
     private authService: AuthService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private tokenService: TokenService
   ) {
     this.registerForm = this.fb.group({
       email: ['', [Validators.required, emailValidator()]],

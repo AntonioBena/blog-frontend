@@ -1,22 +1,28 @@
-<mat-toolbar *ngIf="showToolbar" class="toolbar">
-  <span style="font-weight: 400; cursor: pointer;" (click)="toBlog()" >Blogger</span>
+<mat-toolbar *ngIf="isAuthenticated" class="toolbar">
+  <span style="font-weight: 400; cursor: pointer;" (click)="toBlog()">Blogger</span>
   <span class="example-spacer"></span>
+
   <div style="display: flex; align-items: center;">
-   <span *ngIf="!isWriteingNew">
-    <button *ngIf="isWriter" mat-icon-button class="example-icon" (click)="toEditor()"
-    matTooltip="Write new post"
-    aria-label="Example icon-button with share icon">
-    <mat-icon>edit_note</mat-icon>
-  </button>
-   </span>
+    <span *ngIf="userRole === 'WRITER' && !isWritingNew">
+      <button mat-icon-button class="example-icon" (click)="toEditor()"
+        matTooltip="Write new post"
+        aria-label="Example icon-button with share icon">
+        <mat-icon>edit_note</mat-icon>
+      </button>
+    </span>
   </div>
+  <button mat-icon-button class="example-icon favorite-icon" (click)="logout()"
+    matTooltip="Logout"
+    aria-label="Example icon-button with heart icon">
+    <mat-icon>logout</mat-icon>
+  </button>
   <button mat-icon-button class="example-icon favorite-icon" (click)="toProfile()"
-  matTooltip="User Profile"
-  aria-label="Example icon-button with heart icon">
+    matTooltip="User Profile"
+    aria-label="Example icon-button with heart icon">
     <mat-icon>person</mat-icon>
   </button>
 </mat-toolbar>
-<div class="empty-space"></div>
+<div *ngIf="isAuthenticated" class="empty-space"></div>
 
 <div class="toast-container" *ngIf="showToast" [ngClass]="{
   success: toastrType == 'success',
