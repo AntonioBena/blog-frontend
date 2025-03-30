@@ -1,21 +1,46 @@
 <div class="main-container">
   <div class="content">
     <h1>
-      <span [innerHTML]="postTitle"></span>
+      <span>{{selectedPost.title}}</span>
     </h1>
-    <div class="author">
-      <span>By </span>
-      <span><a href="#" class="follow">{{by}}</a></span>
-    </div>
 
-    <div class="metadata">{{publishedAt}}</div>
+    <p class="posted-by">by <a href="#" class="follow">{{selectedPost.postOwner.firstName}}
+        {{selectedPost.postOwner.lastName}}</a></p>
+    <p class="published-at">Published on {{selectedPost.publishedAt | date: 'MMMM d, y' }}</p>
 
     <mat-divider class="divider"></mat-divider>
     <div class="stats">
-      <span matTooltip="{{likes}} reactions">❤️ {{ likes }}</span>
-      <span matTooltip="{{comments}} comments">💬 {{ comments }}</span>
+      <span matTooltip="{{selectedPost.likeCount}} reactions" class="interactive" (click)="onLikeClicked()">
+        ❤️ {{ selectedPost.likeCount }}
+      </span>
+
+      <span class="interactive comment" matTooltip="{{this.selectedPost.commentCount}} comments"
+        (click)="onCommentClicked()">
+        💬 {{ selectedPost.commentCount }}
+      </span>
     </div>
     <mat-divider class="divider"></mat-divider>
-    <div #contentContainer [innerHTML]="postContent | safeHtml"></div>
+    <div #contentContainer [innerHTML]="this.postContent| safeHtml"></div>
+
+
+    <div #commentSection class="comment-container">
+      <h3>Comments ({{ this.selectedPost.commentCount }})</h3>
+      <form [formGroup]="commentForm" (ngSubmit)="addComment()" class="comment-form">
+        <mat-form-field appearance="outline" class="comment-input">
+          <mat-label>Write a comment...</mat-label>
+          <input matInput formControlName="comment" type="text" required />
+        </mat-form-field>
+        <button mat-stroked-button type="submit" [disabled]="commentForm.invalid">Post</button>
+      </form>
+      <div>
+        <mat-list>
+          <mat-list-item lines="3" class="comment-item" *ngFor="let comment of this.selectedPost.comments">
+            <mat-icon matListItemIcon>chat_bubble</mat-icon>
+            <div class="comment-title" matListItemTitle>{{ comment.user.firstName }} {{ comment.user.lastName }}</div>
+            <div class="created-at" matListItemLine>{{ comment.createdAt | date: 'MMMM d, y, hh:mm' }} h</div>
+            <div class="comment-line" matListItemLine>{{ comment.comment }}</div>
+          </mat-list-item>
+        </mat-list>
+      </div>
+    </div>
   </div>
-</div>

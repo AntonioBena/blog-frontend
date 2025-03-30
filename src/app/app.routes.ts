@@ -13,7 +13,7 @@ export const routes: Routes = [
   { path: RoutesConstants.REGISTER_ROUTE, component: RegisterComponent },
   { path: RoutesConstants.ACTIVATE_ACC_ROUTE, component: AcivateComponent },
   { path: RoutesConstants.MAIN_ROUTE, component: MainComponent }, //TODO add auth guard
-  { path: RoutesConstants.POST_DETAILS, component: PostComponent }, //TODO add auth guard
+  { path: RoutesConstants.POST_DETAILS + `/:id`, component: PostComponent }, //TODO add auth guard
   { path: RoutesConstants.MARKDOWN_EDITOR, component: MarkdownComponent }, //TODO add auth guard
   { path: RoutesConstants.USER_PROFILE, component: UserProfileComponent }, //TODO add auth guard
   { path: '**', redirectTo: RoutesConstants.LOGIN_ROUTE }

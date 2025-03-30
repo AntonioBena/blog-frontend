@@ -1,4 +1,4 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { ApiConstants } from "../../constants/api-constants";
 import { Observable } from "rxjs";
@@ -6,6 +6,8 @@ import { BlogPost } from "../../models/blog-post";
 import { LikeRequest } from "../../models/requests/like-request";
 import { Page } from "../../models/page";
 import { PostCategory } from '../../constants/post-category';
+import { BlogComment } from "../../models/comment";
+import { TokenService } from "../auth/TokenService";
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +16,7 @@ export class BlogPostService {
 
   private apiUrl = ApiConstants.BASE_BLOG_POST_URL;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private tokenService: TokenService) {}
 
   uploadAndPublishBlogPost(blogPost: BlogPost, htmlFile: File) {
     const formData = new FormData();
@@ -29,11 +31,23 @@ export class BlogPostService {
     return this.http.get<Page<BlogPost>>(`${this.apiUrl}/all?page=${page}&size=${size}&category=${c}`);
   }
 
-  getBlogPost(postId: number, userId: number): Observable<BlogPost> { //TODO this will increment view count, extended version of post
-    return this.http.get<BlogPost>(`${this.apiUrl}/${postId}?userId=${userId}`);
+  getBlogPost(postId: number): Observable<BlogPost> {
+    return this.http.get<BlogPost>(`${this.apiUrl}/${postId}`);
   }
 
-  likeUnlikePost(likeRequest: LikeRequest): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/like`, likeRequest);
+
+  getBlogPostHtmlContent(id: number): Observable<string> {
+    return this.http.get(`${this.apiUrl}/${id}/getHtmlContent`, { responseType: 'text' });
+  }
+
+  likeUnlikePost(postId: number): Observable<number> {
+    return this.http.post<number>(`${this.apiUrl}/like?id=${postId}`,{});
+  }
+
+  postComment(comment: string, postId: number): Observable<any> {
+    const payload = { comment };
+    return this.http.post<any>(`${this.apiUrl}/comment`, payload, {
+      params: new HttpParams().set('id', postId.toString()),
+    });
   }
 }

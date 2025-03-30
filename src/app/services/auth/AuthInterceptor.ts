@@ -16,7 +16,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   if (!req.url.startsWith(`${ApiConstants.BASE_AUTH_ENDPOINT}`)) {
     const clonedReq = req.clone({
       setHeaders: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${tokenService.token}`
       }
     });
 
@@ -24,6 +24,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       catchError((error: HttpErrorResponse) => {
         if (error.status === StatusCodes.Unauthorized) {
           console.log("Unauthorized request, redirecting to login...");
+          console.log("ERROR: ", error);
           tokenService.removeToken();
           navigator.navigateToLogin();
         }

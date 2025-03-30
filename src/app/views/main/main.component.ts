@@ -10,6 +10,7 @@ import { catchError, throwError } from 'rxjs';
 import { ToastrService } from '../../services/toastr.service';
 import { ToastType } from '../../constants/toast-types';
 import { BlogPost } from '../../models/blog-post';
+import { StatusCodes } from '../../constants/http-status-codes';
 
 @Component({
   selector: 'app-main',
@@ -33,19 +34,19 @@ export class MainComponent implements OnInit {
   }
 
   async getAllPosts(page: number, size: number, category: PostCategory) {
-    console.log('getting all statistics');
+    console.log('getting all blog posts');
     this.blogService
       .getAllShortBlogPosts(page, size, category)
       .pipe(
         catchError((error) => {
-          if (error.status === 400 || error.status === 500) {
+          if (error.status === StatusCodes.BadRequest || error.status === StatusCodes.InternalServerError) {
             this.toastr.showToastTc(ToastType.ERROR, 'Can not get blog posts');
           }
           return throwError(() => new Error('Can not get blog posts ' + error));
         })
       )
       .subscribe((resp) => {
-        console.log('gettered sttistics ', resp);
+        console.log('gettered blog posts ', resp);
         this.posts = resp.content;
       });
   }

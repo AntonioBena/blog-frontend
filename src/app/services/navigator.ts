@@ -23,6 +23,10 @@ export class NavigatorService{
     return this.router.navigate(['/' + RoutesConstants.ACTIVATE_ACC_ROUTE, {'data': email}]);
   }
 
+  public navigateToSelectedBlogPost(postId: number){
+    return this.router.navigate(['/' + RoutesConstants.POST_DETAILS,  postId]);
+  }
+
   public navigateToMain(){
     this.toolbar.show();
     return this.router.navigate(['/' + RoutesConstants.MAIN_ROUTE]);

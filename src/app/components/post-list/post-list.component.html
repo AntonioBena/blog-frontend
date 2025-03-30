@@ -1,5 +1,5 @@
 <div class="post-list">
-  <div *ngFor="let post of posts" class="post" (click)="onPostClick(post)">
+  <div *ngFor="let post of posts" class="post" (click)="fetchPost(post.id)">
     <div class="post-content">
       <p class="posted-by">by {{post.postOwner.firstName}} {{post.postOwner.lastName}}</p>
       <p class="published-at">Published on {{post.publishedAt | date: 'MMMM d, y' }}</p>

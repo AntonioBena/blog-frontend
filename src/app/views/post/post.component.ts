@@ -1,9 +1,9 @@
+import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import {
   ChangeDetectorRef,
   Component,
   ElementRef,
-  Input,
   OnInit,
   ViewChild,
   ViewContainerRef,
@@ -14,8 +14,18 @@ import { MatDividerModule } from '@angular/material/divider';
 import { SafeHtml } from '@angular/platform-browser';
 import { YouTubePlayerModule } from '@angular/youtube-player';
 import { SafeHtmlPipe } from '../../services/pipes/safe-html.pipe';
-import { Content } from '../../models/content';
-import { HtmlProcessor } from '../../services/html-processor';
+import { catchError, firstValueFrom, throwError } from 'rxjs';
+import { BlogPostService } from '../../services/backend/blog-post-service';
+import { BlogPost } from '../../models/blog-post';
+import { StatusCodes } from '../../constants/http-status-codes';
+import { ToastType } from '../../constants/toast-types';
+import { ToastrService } from '../../services/toastr.service';
+import { ActivatedRoute } from '@angular/router';
+import { MatFormFieldModule, MatLabel } from '@angular/material/form-field';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatListModule} from '@angular/material/list';
 
 @Component({
   selector: 'app-post',
@@ -25,42 +35,152 @@ import { HtmlProcessor } from '../../services/html-processor';
     MatDividerModule,
     YouTubePlayerModule,
     SafeHtmlPipe,
+    MatFormFieldModule,
+    MatLabel,
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatListModule,
+    MatIconModule
   ],
   templateUrl: './post.component.html',
   styleUrl: './post.component.css',
   encapsulation: ViewEncapsulation.None,
 })
 export class PostComponent implements OnInit {
-  @Input() data: any;
-  dialogData!: Content;
+  private id!: number;
   public postContent: string = '';
+  public selectedPost!: any;
+
+  commentForm: FormGroup;
 
   sanitizedContent!: SafeHtml;
   @ViewChild('contentContainer', { read: ViewContainerRef })
   contentContainer!: ViewContainerRef;
   @ViewChild('contentRef', { static: true }) contentRef!: ElementRef;
-
-  likes: number = 0;
-  comments: number = 0;
-  publishedAt: string = '';
-  by: string = ''; //TODO add getter for user
-  postTitle: any = '';
-
-  private unprocessedHtmlContent: string = ''; //from api
+  @ViewChild('commentSection') commentSection!: ElementRef;
 
   constructor(
-    private htmlProcessor: HtmlProcessor,
-    private changeDetectorRef: ChangeDetectorRef
-  ) {}
+    private fb: FormBuilder,
+    private toastr: ToastrService,
+    private blogService: BlogPostService,
+    private changeDetectorRef: ChangeDetectorRef,
+    public route: ActivatedRoute
+  ) {
+    route.params.subscribe((params) => {
+      this.id = params['id'];
+    });
 
-  ngOnInit(): void {
-    // this.likes = this.data.likes;
-    // this.comments = this.data.comments;
-    // this.publishedAt = this.data.publishedAt;
-    // this.by = this.data.by;
-    // this.postContent = this.data.htmlContent; //read from api
-    // this.postTitle = this.data.postTitle;
-    this.unprocessedHtmlContent = this.dummyContent();
+    this.commentForm = this.fb.group({
+      comment: ['', [Validators.required]],
+    });
+  }
+
+  async ngOnInit(): Promise<void> {
+   this.fetchPost(this.id);
+   await this.getPostHtmlContent(this.id);
+  }
+
+
+  onLikeClicked() {
+    console.log("Like button clicked!");
+    this.blogService
+      .likeUnlikePost(this.id)
+      .pipe(
+        catchError((error) => {
+          if (error.status === StatusCodes.BadRequest || error.status === StatusCodes.InternalServerError) {
+            this.toastr.showToastTc(ToastType.ERROR, 'Can not like at this moment, please try again later');
+          }
+          return throwError(
+            () => new Error('Can not get statistics ' + error)
+          );
+        })
+      )
+      .subscribe((resp) => {
+        console.log('gettered sttistics ', resp);
+        this.selectedPost.likeCount = resp;
+      });
+  }
+
+  onCommentClicked() {
+    this.commentSection.nativeElement.scrollIntoView({ behavior: 'smooth' });
+  }
+
+
+  public addComment() {
+    const commentText = this.commentForm.value.comment?.trim();
+    if (!commentText) return;
+    this.postComment(commentText, this.selectedPost.id);
+  }
+
+  private async postComment(comment: string, postId: number) {
+    console.log("Posting comment...");
+
+    this.blogService.postComment(comment, postId).pipe(
+      catchError((error) => {
+        console.error("Error posting comment:", error);
+        this.toastr.showToastTc(ToastType.ERROR, "Cannot post comment");
+        return throwError(() => new Error("Cannot post comment " + error));
+      })
+    ).subscribe((resp) => {
+      this.commentForm.reset();
+      this.selectedPost.comments = resp;
+    });
+  }
+
+
+  private async fetchPost(postId: number) {
+    try {
+      this.selectedPost = await this.getPostById(postId)
+    } catch (error) {
+      console.error('Error fetching post:', error);
+    }
+  }
+
+  private async getPostById(id: number): Promise<BlogPost | undefined> {
+    console.log('getting blog post');
+    try {
+      const resp = await firstValueFrom(
+        this.blogService.getBlogPost(id).pipe(
+          catchError((error) => {
+            if (error.status === StatusCodes.BadRequest || error.status === StatusCodes.InternalServerError) {
+              this.toastr.showToastTc(ToastType.ERROR, 'Can not get blog posts');
+            }
+            return throwError(() => new Error('Can not get blog posts ' + error));
+          })
+        )
+      );
+      console.log(resp);
+      return resp;
+    } catch (error) {
+      console.error('Error getting blog post:', error);
+      throw error;
+    }
+  }
+
+  private async getPostHtmlContent(id: number) {
+    console.log('getting blog post html content');
+
+    try {
+      const htmlContent = await firstValueFrom(
+        this.blogService.getBlogPostHtmlContent(id).pipe(
+          catchError((error) => {
+            if (error.status === StatusCodes.InternalServerError) {
+              this.toastr.showToastTc(ToastType.ERROR, 'Error fetching content');
+            }
+            this.toastr.showToastTc(ToastType.ERROR, 'Error fetching content');
+            return throwError(() => new Error('Error fetching content ' + error));
+          })
+        )
+      );
+
+      this.postContent = htmlContent;
+      console.log("Fetched HTML content:", htmlContent);
+    } catch (error) {
+      console.error('Error fetching HTML content:', error);
+    }
   }
 
   public isFullSize: boolean = false;
@@ -70,50 +190,10 @@ export class PostComponent implements OnInit {
   }
 
   ngAfterViewInit(): void {
-    this.postContent = this.htmlProcessor.processHtmlInput(
-      this.unprocessedHtmlContent
-    );
     this.changeDetectorRef.detectChanges();
   }
 
   public saveOrEditPost(postContent: string) {
     //TODO encode to byte array
-  }
-
-  private dummyContent() {
-    return `
-  <p><strong>@Autowired</strong> has been a core part of Spring dependency injection for years. However, with the latest updates, developers are encouraged to use <code>constructor injection</code> instead.</p>
-
-
-  <img src="https://blog.pwskills.com/wp-content/uploads/2024/04/Autowired-In-Spring-Boot.jpg" alt="Spring @Autowired">
-
-    <h2>Why is Spring Moving Away from @Autowired?</h2>
-    <ul>
-        <li>Improves **testability**</li>
-        <li>Avoids **reflection-based injection**</li>
-        <li>Ensures **better immutability**</li>
-    </ul>
-
-    <h2>Recommended Approach</h2>
-    <p>Instead of using <code>@Autowired</code>, you should prefer <strong>constructor-based injection</strong>:</p>
-
-    <pre><code>
-    @Service
-    public class UserService {
-        private final UserRepository userRepository;
-
-        public UserService(UserRepository userRepository) {
-            this.userRepository = userRepository;
-        }
-    }
-    </code></pre>
-
-    <h2>Video Explanation</h2>
-    <video src="https://www.youtube.com/watch?v=tX7t45m-4H8"/>
-
-    <p>By using constructor injection, we ensure that dependencies are always available and properly initialized. This makes our code more robust and easier to maintain.</p>
-
-    <p>Want to learn more? Check out the official <a href="https://spring.io/guides" target="_blank">Spring documentation</a>.</p>
-  `;
   }
 }

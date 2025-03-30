@@ -59,7 +59,6 @@ export class MarkdownComponent implements OnInit {
 
   constructor(
     private sanitizer: HtmlSanitizer,
-    private htmlProcessor: HtmlProcessor,
     private toastr: ToastrService,
     private blogService: BlogPostService,
     public dialog: MatDialog,
@@ -128,37 +127,25 @@ export class MarkdownComponent implements OnInit {
     });
 
     this.blogService
-      .uploadAndPublishBlogPost(blogPost, file)
-      .pipe(
-        catchError((error) => {
-          if (error.status === StatusCodes.BadRequest) {
-            this.toastr.showToastTc(
-              ToastType.ERROR,
-              'Please check your inputs'
-            );
-          }
+    .uploadAndPublishBlogPost(blogPost, file)
+    .pipe(
+      catchError((error) => {
+        if (error.status === StatusCodes.BadRequest) {
+          this.toastr.showToastTc(ToastType.ERROR,'Please check your inputs');
+        }
+        console.error('Error creating blog post');
+        this.toastr.showToastTc(ToastType.ERROR,'Error creating blog post');
+        return throwError(() => new Error('Error creating blog post ' + error));
+      })
+    )
+    .subscribe(() => {
+      this.toastr.showToastTc(
+        ToastType.SUCCESS,
+        'Blog post successfully posted!'
+      );
+      this.navigator.navigateToMain();
+    });
 
-          if (
-            error.status !== StatusCodes.Created &&
-            error.status !== StatusCodes.Success
-          ) {
-            console.error('Blog post creation error:', error);
-            this.toastr.showToastTc(
-              ToastType.ERROR,
-              'There was an error uploading your blog post'
-            );
-          }
-          return throwError(
-            () => new Error('Create blog post error: ' + error)
-          );
-        })
-      )
-      .subscribe(() => {
-        this.toastr.showToastTc(ToastType.SUCCESS,
-          'Blog post successfully posted!'
-        );
-        this.navigator.navigateToMain();
-      });
   }
 
   private getPreviewHtmlContent() {
