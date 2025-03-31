@@ -51,4 +51,8 @@ export class BlogPostService {
       params: new HttpParams().set('id', postId.toString()),
     });
   }
+
+  getPostsCountByYear(year: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/analytics/count-by-year/${year}`);
+  }
 }

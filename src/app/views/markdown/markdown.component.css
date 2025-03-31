@@ -76,3 +76,15 @@ mat-form-field mat-label {
 textarea {
   min-height: 100px;
 }
+.custom-dialog-container .mat-dialog-container {
+  max-height: 90vh !important; /* Limits the height */
+  overflow: hidden !important; /* Prevents unwanted scrolling */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ensures the content area inside the dialog scrolls when necessary */
+.custom-dialog-container .dialog-content {
+  overflow-y: auto;
+  flex-grow: 1; /* Allows it to take up remaining space */
+}

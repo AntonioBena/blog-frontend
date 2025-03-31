@@ -7,7 +7,7 @@
           <button class="b"
             mat-stroked-button (click)="toMain()">Cancel</button>
           <button class="b" [disabled]="!htmlForm.get('htmlContent')?.value?.trim()"
-            mat-stroked-button (click)="post()">Post</button>
+            mat-stroked-button (click)="post()">Save</button>
             <button class="b" [disabled]="!htmlForm.get('htmlContent')?.value?.trim()"
             mat-stroked-button (click)="preview()">Preview</button>
         </div>

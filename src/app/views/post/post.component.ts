@@ -4,7 +4,9 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
+  Inject,
   OnInit,
+  Optional,
   ViewChild,
   ViewContainerRef,
   ViewEncapsulation,
@@ -22,12 +24,22 @@ import { ToastType } from '../../constants/toast-types';
 import { ToastrService } from '../../services/toastr.service';
 import { ActivatedRoute } from '@angular/router';
 import { MatFormFieldModule, MatLabel } from '@angular/material/form-field';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { MatListModule} from '@angular/material/list';
+import { MatListModule } from '@angular/material/list';
 import { AuthService } from '../../services/auth/AuthService';
 import { NavigatorService } from '../../services/navigator';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MarkdownContent } from '../../models/markdown-content';
+import { UserDto } from '../../models/user';
+import { Utils } from '../../services/utils/utils';
 
 @Component({
   selector: 'app-post',
@@ -45,7 +57,7 @@ import { NavigatorService } from '../../services/navigator';
     MatInputModule,
     MatButtonModule,
     MatListModule,
-    MatIconModule
+    MatIconModule,
   ],
   templateUrl: './post.component.html',
   styleUrl: './post.component.css',
@@ -69,47 +81,54 @@ export class PostComponent implements OnInit {
   @ViewChild('commentSection') commentSection!: ElementRef;
 
   constructor(
+    private utils: Utils,
     private fb: FormBuilder,
     private toastr: ToastrService,
     private blogService: BlogPostService,
     private changeDetectorRef: ChangeDetectorRef,
     public route: ActivatedRoute,
     private authService: AuthService,
-    private navigator: NavigatorService
+    private navigator: NavigatorService,
+    @Optional() public dialogRef?: MatDialogRef<PostComponent>,
+    @Optional() @Inject(MAT_DIALOG_DATA) public dialogData?: any
   ) {
-    route.params.subscribe((params) => {
-      this.id = params['id'];
-    });
+    if (!this.dialogRef) {
+      route.params.subscribe((params) => {
+        this.id = params['id'];
+      });
+    }
 
     this.commentForm = this.fb.group({
       comment: ['', [Validators.required]],
     });
-
   }
 
   async ngOnInit(): Promise<void> {
-    this.userRole = this.authService.getUserRole();
-   this.fetchPost(this.id);
-   await this.getPostHtmlContent(this.id);
+    await this.initPostComponent();
   }
 
+  private async initPostComponent(){
+    this.userRole = this.authService.getUserRole();
+    if (!this.dialogRef) {
+      this.fetchPost(this.id);
+      await this.getPostHtmlContent(this.id);
+    } else {
+      this.postContent = this.dialogData?.htmlContent;
+      this.selectedPost.title = this.dialogData?.postTitle;
+    }
+  }
 
   onLikeClicked() {
-    console.log("Like button clicked!");
+    console.log('Like button clicked!');
     this.blogService
       .likeUnlikePost(this.id)
       .pipe(
         catchError((error) => {
-          if (error.status === StatusCodes.BadRequest || error.status === StatusCodes.InternalServerError) {
-            this.toastr.showToastTc(ToastType.ERROR, 'Can not like at this moment, please try again later');
-          }
-          return throwError(
-            () => new Error('Can not like at this moment ' + error)
-          );
+          return this.utils.buildError('Can not like at this moment, please try again later', error);
         })
       )
       .subscribe((resp) => {
-        console.log('Liked ', resp);
+        this.utils.buildSuccessLogInfo('Liked', resp);
         this.selectedPost.likeCount = resp;
       });
   }
@@ -118,7 +137,6 @@ export class PostComponent implements OnInit {
     this.commentSection.nativeElement.scrollIntoView({ behavior: 'smooth' });
   }
 
-
   public addComment() {
     const commentText = this.commentForm.value.comment?.trim();
     if (!commentText) return;
@@ -126,24 +144,24 @@ export class PostComponent implements OnInit {
   }
 
   private async postComment(comment: string, postId: number) {
-    console.log("Posting comment...");
+    console.log('Posting comment...');
 
-    this.blogService.postComment(comment, postId).pipe(
-      catchError((error) => {
-        console.error("Error posting comment:", error);
-        this.toastr.showToastTc(ToastType.ERROR, "Cannot post comment");
-        return throwError(() => new Error("Cannot post comment " + error));
-      })
-    ).subscribe((resp) => {
-      this.commentForm.reset();
-      this.selectedPost.comments = resp;
-    });
+    this.blogService
+      .postComment(comment, postId)
+      .pipe(
+        catchError((error) => {
+          return this.utils.buildError('Cannot post comment', error);
+        })
+      )
+      .subscribe((resp) => {
+        this.commentForm.reset();
+        this.selectedPost.comments = resp;
+      });
   }
-
 
   private async fetchPost(postId: number) {
     try {
-      this.selectedPost = await this.getPostById(postId)
+      this.selectedPost = await this.getPostById(postId);
     } catch (error) {
       console.error('Error fetching post:', error);
     }
@@ -155,35 +173,34 @@ export class PostComponent implements OnInit {
       const resp = await firstValueFrom(
         this.blogService.getBlogPost(id).pipe(
           catchError((error) => {
-            if (error.status === StatusCodes.BadRequest || error.status === StatusCodes.InternalServerError) {
-              this.toastr.showToastTc(ToastType.ERROR, 'Can not get blog posts');
+            if (error.status === StatusCodes.BadRequest) {
+              return this.utils.buildError('Cant seem to find that blog post', error);
             }
-            return throwError(() => new Error('Can not get blog posts ' + error));
+            return this.utils.buildError('Cant seem to find blog post', error);
           })
         )
       );
-      console.log(resp)
+      this.utils.buildSuccessLogInfo('Found blog post', resp);
       this.setCanEdit(resp);
       return resp;
     } catch (error) {
-      console.error('Error getting blog post:', error);
-      throw error;
+      throw this.utils.buildErrorThrow('Cant seem to find blog post', error);
     }
   }
 
-  private setCanEdit(resp: BlogPost){
-    if(resp.postOwner.email === this.authService.getAuthenticatedUserInfo()){
+  private setCanEdit(resp: BlogPost) {
+    if (resp.postOwner.email === this.authService.getAuthenticatedUserInfo()) {
       this.canEdit = true;
-    }else{
+    } else {
       this.canEdit = false;
     }
   }
 
-  public deletePost(){
-    console.log("delete")
+  public deletePost() {
+    console.log('delete');
   }
 
-  public editPost(){
+  public editPost() {
     this.navigator.navigateToEditor(this.selectedPost, this.postContent);
   }
 
@@ -195,10 +212,12 @@ export class PostComponent implements OnInit {
         this.blogService.getBlogPostHtmlContent(id).pipe(
           catchError((error) => {
             if (error.status === StatusCodes.InternalServerError) {
-              this.toastr.showToastTc(ToastType.ERROR, 'Error fetching content');
+              this.toastr.showToastTc(
+                ToastType.ERROR,
+                'Error fetching content'
+              );
             }
-            this.toastr.showToastTc(ToastType.ERROR, 'Error fetching content');
-            return throwError(() => new Error('Error fetching content ' + error));
+            throw this.utils.buildErrorThrow('Error fetching html content', error);
           })
         )
       );

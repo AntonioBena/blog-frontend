@@ -1,5 +1,5 @@
 import { AbstractControl, ValidatorFn } from '@angular/forms';
-import { GenericConstants } from '../constants/app-generic-constants';
+import { GenericConstants } from '../constants/regex-constants';
 
 export function emailValidator(): ValidatorFn {
   return (control: AbstractControl): { [key: string]: any } | null => {

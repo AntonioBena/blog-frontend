@@ -1,4 +1,3 @@
-import { Role } from "./role";
 import { WriterStatus } from "./writer-status";
 
 export class UserDto {

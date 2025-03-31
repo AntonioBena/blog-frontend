@@ -1,40 +1,38 @@
 <div class="main-container">
   <div class="content">
     <h1>
-      <span>{{selectedPost.title}}</span>
+      <span *ngIf="selectedPost">{{selectedPost?.title}}</span>
     </h1>
-    <p class="posted-by">by <a href="#" class="follow">{{selectedPost.postOwner.firstName}}
-        {{selectedPost.postOwner.lastName}}</a></p>
-    <p class="published-at">Published on {{selectedPost.publishedAt | date: 'MMMM d, y' }}</p>
-    <mat-divider class="divider"></mat-divider>
-    <div class="stats">
+    <span *ngIf="!this.dialogRef">
+      <p class="posted-by">by <a href="#" class="follow">{{selectedPost?.postOwner.firstName}}
+          {{selectedPost?.postOwner.lastName}}</a></p>
+      <p class="published-at" *ngIf="selectedPost">Published on {{selectedPost?.publishedAt | date: 'MMMM d, y' }}</p>
+    </span>
+    <mat-divider class="divider" *ngIf="!this.dialogRef"></mat-divider>
+    <div class="stats" *ngIf="!this.dialogRef">
       <div>
-        <span matTooltip="{{selectedPost.likeCount}} reactions" class="interactive" (click)="onLikeClicked()">
+        <span matTooltip="{{selectedPost?.likeCount}} reactions" class="interactive" (click)="onLikeClicked()">
           ❤️ {{ selectedPost.likeCount }}
         </span>
-        <span class="interactive comment" matTooltip="{{this.selectedPost.commentCount}} comments"
+        <span class="interactive comment" matTooltip="{{this.selectedPost?.commentCount}} comments"
           (click)="onCommentClicked()">
           💬 {{ selectedPost.commentCount }}
         </span>
       </div>
-
       <div class="example-icon">
-        <button *ngIf="userRole === 'WRITER' && canEdit" (click)="deletePost()"
-        mat-icon-button class="example-icon" matTooltip="Delete post"
-          aria-label="Example icon-button with share icon">
+        <button *ngIf="userRole === 'WRITER' && canEdit" (click)="deletePost()" mat-icon-button class="example-icon"
+          matTooltip="Delete post" aria-label="Example icon-button with share icon">
           <mat-icon>delete_sweep</mat-icon>
         </button>
-        <button *ngIf="userRole === 'WRITER' && canEdit" (click)="editPost()"
-        mat-icon-button  matTooltip="Edit post"
+        <button *ngIf="userRole === 'WRITER' && canEdit" (click)="editPost()" mat-icon-button matTooltip="Edit post"
           aria-label="Example icon-button with share icon">
           <mat-icon>edit_note</mat-icon>
         </button>
       </div>
-
     </div>
-    <mat-divider class="divider"></mat-divider>
-    <div #contentContainer [innerHTML]="this.postContent| safeHtml"></div>
-    <div #commentSection class="comment-container">
+    <mat-divider class="divider" *ngIf="!this.dialogRef"></mat-divider>
+    <div #contentContainer [innerHTML]="this.postContent | safeHtml"></div>
+    <div #commentSection class="comment-container" *ngIf="!this.dialogRef">
       <h3>Comments ({{ this.selectedPost.commentCount }})</h3>
       <form [formGroup]="commentForm" (ngSubmit)="addComment()" class="comment-form">
         <mat-form-field appearance="outline" class="comment-input">

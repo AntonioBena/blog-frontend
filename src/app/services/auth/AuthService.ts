@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { RegistrationRequest } from '../../models/requests/RegistrationRequest';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs/internal/Observable';
 import { AuthenticationRequest } from '../../models/requests/AuthenticationRequest';
 import { ApiConstants } from '../../constants/api-constants';
-import { JwtHelperService, JwtModule } from '@auth0/angular-jwt';
+import { JwtHelperService } from '@auth0/angular-jwt';
 import { BehaviorSubject } from 'rxjs';
+import { UserService } from '../backend/user-service';
 
 @Injectable({
   providedIn: 'root',

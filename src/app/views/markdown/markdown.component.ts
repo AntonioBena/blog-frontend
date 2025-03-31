@@ -17,9 +17,8 @@ import {
 } from '@kolkov/angular-editor';
 import { MatDialog } from '@angular/material/dialog';
 import { MatInputModule } from '@angular/material/input';
-import { Content } from '../../models/content';
+import { MarkdownContent } from '../../models/markdown-content';
 import { PostCategory } from '../../constants/post-category';
-import { PreviewDialogComponent } from '../dialogs/preview-dialog/preview-dialog.component';
 import { NavigatorService } from '../../services/navigator';
 import { BlogPostService } from '../../services/backend/blog-post-service';
 import { catchError, throwError } from 'rxjs';
@@ -30,6 +29,8 @@ import { StatusCodes } from '../../constants/http-status-codes';
 import { HtmlSanitizer } from '../../services/sanitizer';
 import { ApiConstants } from '../../constants/api-constants';
 import { ActivatedRoute } from '@angular/router';
+import { PostComponent } from '../post/post.component';
+import { Utils } from '../../services/utils/utils';
 
 @Component({
   selector: 'app-markdown',
@@ -58,6 +59,7 @@ export class MarkdownComponent implements OnInit {
   });
 
   constructor(
+    private utils: Utils,
     private route: ActivatedRoute,
     private sanitizer: HtmlSanitizer,
     private toastr: ToastrService,
@@ -116,7 +118,7 @@ export class MarkdownComponent implements OnInit {
           title: this.givenPost.title,
           shortContent: this.givenPost.shortContent,
           shortContentImageUrl: this.givenPost.shortContentImageUrl,
-          category: this.getEnumValue(postCategory)
+          category: this.getEnumValue(postCategory),
         });
       }
       if (params['content']) {
@@ -137,7 +139,7 @@ export class MarkdownComponent implements OnInit {
 
   private getEnumValue(category: string): PostCategory {
     const enumValue = PostCategory[category as keyof typeof PostCategory];
-    return enumValue || category as PostCategory;
+    return enumValue || (category as PostCategory);
   }
 
   public toMain() {
@@ -167,29 +169,19 @@ export class MarkdownComponent implements OnInit {
       .pipe(
         catchError((error) => {
           if (error.status === StatusCodes.BadRequest) {
-            this.toastr.showToastTc(
-              ToastType.ERROR,
-              'Please check your inputs'
-            );
+            this.utils.buildError('Please check your inputs', '');
           }
-          console.error('Error creating blog post');
-          this.toastr.showToastTc(ToastType.ERROR, 'Error creating blog post');
-          return throwError(
-            () => new Error('Error creating blog post ' + error)
-          );
+          return this.utils.buildErrorThrow('Error creating blog post', error);
         })
       )
       .subscribe(() => {
-        this.toastr.showToastTc(
-          ToastType.SUCCESS,
-          'Blog post successfully posted!'
-        );
+        this.utils.buildSuccess('Blog post successfully posted!', '');
         this.navigator.navigateToMain();
       });
   }
 
   private getPreviewHtmlContent() {
-    var content = new Content();
+    var content = new MarkdownContent();
     content.by = 'nepoznati pisac';
     content.category = this.titleForm.value.category;
     content.postTitle = this.titleForm.value.title;
@@ -201,15 +193,19 @@ export class MarkdownComponent implements OnInit {
 
   public preview() {
     if (!this.titleForm.valid) {
-      return; //TODO add some kind of message
+      this.utils.buildError('Please check your inputs', '');
+      return;
     }
 
-    this.dialog.open(PreviewDialogComponent, {
-      width: '900px',
-      maxHeight: '80vh',
-      data: {
-        object: this.getPreviewHtmlContent(),
-      },
+    const dialogRef = this.dialog.open(PostComponent, {
+      width: '70%',
+      maxWidth: '50vw',
+      panelClass: 'custom-dialog-container',
+      data: this.getPreviewHtmlContent(),
+    });
+
+    dialogRef.afterClosed().subscribe(() => {
+      //do after preview
     });
   }
 }

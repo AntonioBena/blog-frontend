@@ -3,7 +3,7 @@ import { NavigatorService } from '../../services/navigator';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTabsModule } from '@angular/material/tabs';
-import { UserConstants } from '../../constants/user-constants';
+import { UserConstants } from '../../constants/user-menu-constants';
 import { MatFormFieldModule, MatLabel } from '@angular/material/form-field';
 import {
   FormBuilder,
@@ -13,9 +13,7 @@ import {
 } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { UserService } from '../../services/backend/user-service';
-import { catchError, throwError } from 'rxjs';
-import { ToastType } from '../../constants/toast-types';
-import { ToastrService } from '../../services/toastr.service';
+import { catchError } from 'rxjs';
 import { UserDto } from '../../models/user';
 import { Role } from '../../models/role';
 import { MatSelectModule } from '@angular/material/select';
@@ -23,7 +21,8 @@ import { AuthService } from '../../services/auth/AuthService';
 import { BlogPost } from '../../models/blog-post';
 import { PostListComponent } from '../../components/post-list/post-list.component';
 import { BlogPostService } from '../../services/backend/blog-post-service';
-import { StatusCodes } from '../../constants/http-status-codes';
+import { NgxChartsModule } from '@swimlane/ngx-charts';
+import { Utils } from '../../services/utils/utils';
 
 @Component({
   selector: 'app-user-profile',
@@ -36,7 +35,8 @@ import { StatusCodes } from '../../constants/http-status-codes';
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    PostListComponent
+    PostListComponent,
+    NgxChartsModule,
   ],
   templateUrl: './user-profile.component.html',
   styleUrl: './user-profile.component.css',
@@ -54,21 +54,30 @@ export class UserProfileComponent {
   public selectedRole = Role.READER;
   Role = Role;
 
+  postData: any[] = [];
+  view: [number, number] = [700, 400];
+
   onTabChange(index: number) {
     this.selectedTab = this.userTabs[index] as UserConstants;
 
-    if(this.selectedTab === UserConstants.POSTS){
-      this.getMyPosts(0,10)
+    if (this.selectedTab === UserConstants.POSTS) {
+      this.getMyPosts(0, 10);
+    }
+    if (this.selectedTab == UserConstants.STATS) {
+      const currentYear = new Date().getFullYear();
+      this.blogService.getPostsCountByYear(currentYear).subscribe((data) => {
+        this.postData = this.utils.formatChartData(data);
+      });
     }
   }
 
   constructor(
-    private toastr: ToastrService,
     private userService: UserService,
     private navigator: NavigatorService,
     private fb: FormBuilder,
     private authService: AuthService,
     private blogService: BlogPostService,
+    private utils: Utils
   ) {
     this.userRole = this.authService.getUserRole();
     this.getCurrentUser();
@@ -81,7 +90,7 @@ export class UserProfileComponent {
   }
 
   onSubmit() {
-    console.log('submitted: ', this.userInfoGroup.value);
+    this.utils.buildSuccessLogInfo('submitted', this.userInfoGroup.value);
 
     let user = new UserDto();
     user.firstName = this.userInfoGroup.value.name;
@@ -90,8 +99,8 @@ export class UserProfileComponent {
     user.role = this.userInfoGroup.value.role;
     user.role = user.role.toUpperCase();
 
-    if(this.userInfoGroup.valid){
-      this.updateCurrentUser(user)
+    if (this.userInfoGroup.valid) {
+      this.updateCurrentUser(user);
     }
   }
 
@@ -101,35 +110,33 @@ export class UserProfileComponent {
       .updateUser(userDto)
       .pipe(
         catchError((error) => {
-          return this.buildError(error, 'Cannot update user!');
+          return this.utils.buildError('Can not update user!', error);
         })
       )
       .subscribe((response) => {
         this.updateInputs(response);
-        console.log("OLD ROLE " + oldRole.toUpperCase() + " NEW ROLE " + response.role.toUpperCase() )
-        if (oldRole.trim().toUpperCase() !== response.role.trim().toUpperCase()) {
-          this.toastr.showToastTc(ToastType.SUCCESS, 'Successfully updated, Redirecting to login!');
-            this.authService.logout();
-            this.navigator.navigateToLogin();
+        this.utils.buildSuccessLogInfo('NEW ROLE', response.role.toUpperCase());
+        if (oldRole.trim().toUpperCase() !==
+                            response.role.trim().toUpperCase()) {
+                              this.utils.buildSuccess('Successfully updated, Redirecting to login!', '');
+          this.authService.logout();
+          this.navigator.navigateToLogin();
         }
-        this.toastr.showToastTc(ToastType.SUCCESS, 'Successfully updated Profile!');
+        this.utils.buildSuccess('Successfully updated Profile!', '');
       });
   }
 
-  public getMyPosts(page: number, size:number){
+  public getMyPosts(page: number, size: number) {
     console.log('getting all blog posts');
     this.blogService
       .getPostsByAuthor(page, size)
       .pipe(
         catchError((error) => {
-          if (error.status === StatusCodes.BadRequest || error.status === StatusCodes.InternalServerError) {
-            this.toastr.showToastTc(ToastType.ERROR, 'Can not get blog posts');
-          }
-          return throwError(() => new Error('Can not get blog posts ' + error));
+          return this.utils.buildError(error, 'Can not get blog posts!');
         })
       )
       .subscribe((resp) => {
-        console.log('gettered blog posts ', resp);
+        this.utils.buildSuccessLogInfo('gettered blog posts', resp);
         this.posts = resp.content;
       });
   }
@@ -139,18 +146,12 @@ export class UserProfileComponent {
       .getUserDetails()
       .pipe(
         catchError((error) => {
-          return this.buildError(error, 'Cannot get user details!');
+          return this.utils.buildError(error, 'Error getting user!');
         })
       )
       .subscribe((response) => {
         this.updateInputs(response);
       });
-  }
-
-  private buildError(error: any, message: string) {
-    this.toastr.showToastTc(ToastType.ERROR, message);
-    console.log(message);
-    return throwError(() => new Error(message + ', ' + error));
   }
 
   private updateInputs(response: UserDto) {

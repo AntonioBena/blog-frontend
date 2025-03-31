@@ -2,8 +2,6 @@ import { Injectable } from "@angular/core";
 import { Router } from "@angular/router";
 import { RoutesConstants } from '../constants/routes-constants';
 import { ToolBarService } from "./tool-bar-service";
-import { TokenService } from './auth/TokenService';
-import { BlogPost } from "../models/blog-post";
 
 
 @Injectable({

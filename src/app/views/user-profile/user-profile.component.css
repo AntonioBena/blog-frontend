@@ -27,3 +27,11 @@
   padding-top: 20px;
   overflow: hidden;
 }
+
+.chart-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 400px;
+  width: 100%;
+}

@@ -1,6 +1,6 @@
 import { PostCategory } from "../constants/post-category";
 
-export class Content {
+export class MarkdownContent {
   by!: string;
   comments!: number;
   htmlContent!: any;
