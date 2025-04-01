@@ -15,12 +15,12 @@ export const routes: Routes = [
   { path: RoutesConstants.REGISTER_ROUTE, component: RegisterComponent },
   { path: RoutesConstants.ACTIVATE_ACC_ROUTE, component: AcivateComponent },
   { path: RoutesConstants.MAIN_ROUTE, component: MainComponent,
-    canActivate: [RoleGuard], data: { expectedRoles: ['WRITER', 'ADMIN', 'READER'] }},
+    canActivate: [RoleGuard], data: { expectedRoles: ['ROLE_WRITER', 'ROLE_ADMIN', 'ROLE_READER'] }},
   { path: RoutesConstants.POST_DETAILS + `/:id`, component: PostComponent,
-    canActivate: [RoleGuard], data: { expectedRoles: ['WRITER', 'ADMIN', 'READER'] }},
+    canActivate: [RoleGuard], data: { expectedRoles: ['ROLE_WRITER', 'ROLE_ADMIN', 'ROLE_READER'] }},
   { path: RoutesConstants.MARKDOWN_EDITOR, component: MarkdownComponent,
-    canActivate: [RoleGuard], data: { expectedRoles: ['WRITER', 'ADMIN'] } },
+    canActivate: [RoleGuard], data: { expectedRoles: ['ROLE_WRITER', 'ROLE_ADMIN'] } },
   { path: RoutesConstants.USER_PROFILE, component: UserProfileComponent,
-    canActivate: [RoleGuard], data: { expectedRoles: ['WRITER', 'ADMIN', 'READER'] }},
+    canActivate: [RoleGuard], data: { expectedRoles: ['ROLE_WRITER', 'ROLE_ADMIN', 'ROLE_READER'] }},
   { path: '**', redirectTo: RoutesConstants.LOGIN_ROUTE }
 ];

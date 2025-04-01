@@ -6,7 +6,6 @@ import { AuthenticationRequest } from '../../models/requests/AuthenticationReque
 import { ApiConstants } from '../../constants/api-constants';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { BehaviorSubject } from 'rxjs';
-import { UserService } from '../backend/user-service';
 
 @Injectable({
   providedIn: 'root',
@@ -80,6 +79,7 @@ export class AuthService {
   }
 
   public logout(): void {
+    this.setAuthState(false);
     localStorage.removeItem(ApiConstants.TOKEN);
   }
 }
