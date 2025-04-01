@@ -3,7 +3,7 @@
   <span class="example-spacer"></span>
 
   <div style="display: flex; align-items: center;">
-    <span *ngIf="userRole === 'WRITER' && !isWritingNew">
+    <span *ngIf="userRole === 'ROLE_WRITER' && !isWritingNew">
       <button mat-icon-button class="example-icon" (click)="toEditor()"
         matTooltip="Write new post"
         aria-label="Example icon-button with share icon">

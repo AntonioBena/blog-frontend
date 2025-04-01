@@ -20,11 +20,11 @@
         </span>
       </div>
       <div class="example-icon">
-        <button *ngIf="userRole === 'WRITER' && canEdit" (click)="deletePost()" mat-icon-button class="example-icon"
+        <button *ngIf="userRole === 'ROLE_WRITER' && canEdit" (click)="deletePost()" mat-icon-button class="example-icon"
           matTooltip="Delete post" aria-label="Example icon-button with share icon">
           <mat-icon>delete_sweep</mat-icon>
         </button>
-        <button *ngIf="userRole === 'WRITER' && canEdit" (click)="editPost()" mat-icon-button matTooltip="Edit post"
+        <button *ngIf="userRole === 'ROLE_WRITER' && canEdit" (click)="editPost()" mat-icon-button matTooltip="Edit post"
           aria-label="Example icon-button with share icon">
           <mat-icon>edit_note</mat-icon>
         </button>

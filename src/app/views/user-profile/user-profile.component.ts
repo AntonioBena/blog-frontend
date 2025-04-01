@@ -97,6 +97,7 @@ export class UserProfileComponent {
     user.lastName = this.userInfoGroup.value.lastName;
     user.email = this.userInfoGroup.value.email;
     user.role = this.userInfoGroup.value.role.toUpperCase();
+    user.id = this.currentUser.id;
 
     if (this.userInfoGroup.valid) {
       this.updateCurrentUser(user);
@@ -163,7 +164,7 @@ export class UserProfileComponent {
         lastName: this.currentUser.lastName,
         email: this.currentUser.email,
         role:
-          this.currentUser.role?.toUpperCase() === 'ROLE_READER'
+          this.currentUser.role?.toUpperCase() === 'ROLE_READER' || this.currentUser.role?.toUpperCase() === 'READER'
             ? Role.READER
             : Role.WRITER,
       });

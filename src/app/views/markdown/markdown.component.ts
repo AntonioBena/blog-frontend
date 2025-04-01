@@ -147,13 +147,14 @@ export class MarkdownComponent implements OnInit {
   }
 
   public post() {
+    console.log(this.titleForm)
     if (!this.titleForm.valid) {
       this.toastr.showToastTc(ToastType.ERROR, 'All the fialed are mandatory');
     }
 
     let blogPost = new BlogPost();
-    blogPost.id = this.givenPost.id;
-    blogPost.postOwner = this.givenPost.postOwner;
+    blogPost.id = this.givenPost?.id;
+    blogPost.postOwner = this.givenPost?.postOwner;
     blogPost.title = this.titleForm.value.title;
     blogPost.shortContent = this.titleForm.value.shortContent;
     let category = this.titleForm.value.category;
