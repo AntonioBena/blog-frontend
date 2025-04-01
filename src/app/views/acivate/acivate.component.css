@@ -53,3 +53,17 @@
 .auth-pin-wrap .code-input:nth-child(n+2){
   margin-left: 10px;
 }
+.login-link {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.login-link a {
+  text-decoration: none;
+  color: #3f51b5;
+  font-weight:400;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
+}

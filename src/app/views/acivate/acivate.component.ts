@@ -134,4 +134,8 @@ export class AcivateComponent implements OnInit {
         });
     }
   }
+
+  onLoginLink() {
+    this.navigator.navigateToLogin();
+  }
 }

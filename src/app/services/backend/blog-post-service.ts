@@ -55,4 +55,8 @@ export class BlogPostService {
   getPostsCountByYear(year: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/analytics/count-by-year/${year}`);
   }
+
+  deleteBlogPost(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/delete/${id}`);
+  }
 }

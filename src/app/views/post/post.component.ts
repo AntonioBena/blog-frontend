@@ -4,6 +4,7 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
+  inject,
   Inject,
   OnInit,
   Optional,
@@ -36,10 +37,16 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatListModule } from '@angular/material/list';
 import { AuthService } from '../../services/auth/AuthService';
 import { NavigatorService } from '../../services/navigator';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialog,
+  MatDialogRef,
+} from '@angular/material/dialog';
 import { MarkdownContent } from '../../models/markdown-content';
 import { UserDto } from '../../models/user';
 import { Utils } from '../../services/utils/utils';
+import { DialogRef } from '@angular/cdk/dialog';
+import { DialogComponent } from '../dialogs/dialog/dialog.component';
 
 @Component({
   selector: 'app-post',
@@ -79,6 +86,7 @@ export class PostComponent implements OnInit {
   contentContainer!: ViewContainerRef;
   @ViewChild('contentRef', { static: true }) contentRef!: ElementRef;
   @ViewChild('commentSection') commentSection!: ElementRef;
+  readonly deleteDialog = inject(MatDialog);
 
   constructor(
     private utils: Utils,
@@ -107,7 +115,7 @@ export class PostComponent implements OnInit {
     await this.initPostComponent();
   }
 
-  private async initPostComponent(){
+  private async initPostComponent() {
     this.userRole = this.authService.getUserRole();
     if (!this.dialogRef) {
       this.fetchPost(this.id);
@@ -124,7 +132,10 @@ export class PostComponent implements OnInit {
       .likeUnlikePost(this.id)
       .pipe(
         catchError((error) => {
-          return this.utils.buildError('Can not like at this moment, please try again later', error);
+          return this.utils.buildError(
+            'Can not like at this moment, please try again later',
+            error
+          );
         })
       )
       .subscribe((resp) => {
@@ -174,7 +185,10 @@ export class PostComponent implements OnInit {
         this.blogService.getBlogPost(id).pipe(
           catchError((error) => {
             if (error.status === StatusCodes.BadRequest) {
-              return this.utils.buildError('Cant seem to find that blog post', error);
+              return this.utils.buildError(
+                'Cant seem to find that blog post',
+                error
+              );
             }
             return this.utils.buildError('Cant seem to find blog post', error);
           })
@@ -197,7 +211,34 @@ export class PostComponent implements OnInit {
   }
 
   public deletePost() {
-    console.log('delete');
+    const dialogRef = this.deleteDialog.open(DialogComponent, {
+      width: '400px',
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.blogService
+          .deleteBlogPost(this.selectedPost.id)
+          .pipe(
+            catchError((error) => {
+              if (error.status === StatusCodes.BadRequest) {
+                return this.utils.buildError(
+                  'Cant seem to find that blog post',
+                  error
+                );
+              }
+              return this.utils.buildError(
+                'There was error with deleting your blog post!',
+                error
+              );
+            })
+          )
+          .subscribe(() => {
+            this.utils.buildSuccess('Blog post is deleted!', '');
+            this.navigator.navigateToMain();
+          });
+      }
+    });
   }
 
   public editPost() {
@@ -217,7 +258,10 @@ export class PostComponent implements OnInit {
                 'Error fetching content'
               );
             }
-            throw this.utils.buildErrorThrow('Error fetching html content', error);
+            throw this.utils.buildErrorThrow(
+              'Error fetching html content',
+              error
+            );
           })
         )
       );
@@ -236,9 +280,5 @@ export class PostComponent implements OnInit {
 
   ngAfterViewInit(): void {
     this.changeDetectorRef.detectChanges();
-  }
-
-  public saveOrEditPost(postContent: string) {
-    //TODO encode to byte array
   }
 }
