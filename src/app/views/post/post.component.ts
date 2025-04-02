@@ -167,6 +167,7 @@ export class PostComponent implements OnInit {
       .subscribe((resp) => {
         this.commentForm.reset();
         this.selectedPost.comments = resp;
+        this.selectedPost.commentCount = this.selectedPost?.commentCount +1;
       });
   }
 

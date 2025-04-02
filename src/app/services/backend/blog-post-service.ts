@@ -29,7 +29,7 @@ export class BlogPostService {
   }
 
   getPostsByAuthor(page: number, size: number){
-    return this.http.get<Page<BlogPost>>(`${this.apiUrl}/all/author?page=${page}&size=${size}`);
+    return this.http.get<Page<BlogPost>>(`${this.apiUrl}/all?page=${page}&size=${size}`);
   }
 
   getBlogPost(postId: number): Observable<BlogPost> {
